@@ -1,0 +1,3 @@
+[submodule "mathfeature"]
+	path = mathfeature
+	url = https://github.com/Bonidia/MathFeature
