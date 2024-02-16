@@ -158,18 +158,14 @@ def fitting(test_data, score_name, clf_fit, X_test, y_test, output_table, output
         model (DataFrame): The score table DataFrame.
     """
     # Generate predictions using the trained classifier
-    #print(X_test.values)
     X_test = X_test.apply(pd.to_numeric, errors='coerce')
-    #print(X_test)
     predictions = clf_fit.predict(X_test.values)
     preds_proba = clf_fit.predict_proba(X_test.values)[:, 1]
     # Calculate and save metrics if output_metrics is provided
     if output_metrics is not None:
         metrics(predictions, y_test, preds_proba, output_metrics)
-
     # Generate probability scores for the positive class
     scores = clf_fit.predict_proba(X_test.values)[:, 1]
-
     # Create a score table with sequence names, predicted labels, and scores
     model = Score_table(test_data, predictions, scores, score_name, output_table)
 
@@ -195,24 +191,13 @@ def make_dataset(test_edges, carac, carac2):
     carac.index = carac.index.astype(str)
     carac2.index = carac2.index.astype(str)
     
-    #carac = carac.drop_duplicates()
-    #carac2 = carac2.drop_duplicates()
     test_edges.iloc[:, :2] = test_edges.iloc[:, :2].astype(str)
-
-    
     
     # Merge test_edges with carac based on source and target nodes
     test_data = test_edges.merge(carac2, left_on=columns[1], right_index=True).merge(carac, left_on=columns[0], right_index=True)
-
-    
-    print('test_d', test_data)
     
     test_data = test_data.drop_duplicates()
     
-    print('test_d2', test_data)
-    # Remove duplicate rows from the merged dataset
-    
-    # Separate features (X_test) and labels (y_test)
     X_test = test_data.drop(columns, axis=1)
     
     X_test = X_test.select_dtypes(include='number')
@@ -221,11 +206,6 @@ def make_dataset(test_edges, carac, carac2):
     y_test = test_data[columns[2]]
     y_test = y_test.astype(float)
     
-    
-   
-    
-    
-
     return X_test, y_test, test_data
 
 def make_trains(train, test, final_test, carac, carac2):
@@ -252,18 +232,11 @@ def make_trains(train, test, final_test, carac, carac2):
     train_edges = pd.read_csv(train, sep=',')
     test_edges = pd.read_csv(test, sep=',')
     final_test = pd.read_csv(final_test, sep=',')
-    
-        # Drop duplicate rows in the characteristics data
-    
-    #carac = carac.drop_duplicates()
-    #carac2 = carac2.drop_duplicates()
 
     # Create datasets for training, testing, and final testing
     X_train, y_train, test_data = make_dataset(train_edges, carac, carac2)
     X_test, y_test, test_data = make_dataset(test_edges, carac, carac2)
     X_final, y_final, test_data_final = make_dataset(final_test, carac, carac2)
-
-
 
     return X_train, y_train, X_test, y_test, test_data, X_final, y_final, test_data_final
 
@@ -296,26 +269,6 @@ def partial_models(index, datasets, names, train_edges, test_edges, final_test, 
     X_train, y_train, X_test, y_test, test_data, X_final, y_final, test_data_final = \
         make_trains(train_edges, test_edges, final_test, carac, carac)
     
-    #print(X_train)
-    
-    #print('treino', y_train)
-    '''
-    duplicated_indices = X_train.duplicated(keep='first')
-    X_train = X_train[~duplicated_indices]
-    y_train = y_train[~duplicated_indices]
-
-    duplicated_indices = X_test.duplicated(keep='first')
-    X_test = X_test[~duplicated_indices]
-    y_test = y_test[~duplicated_indices]
-    test_data = test_data[~duplicated_indices]
-
-    duplicated_indices = X_final.duplicated(keep='first')
-    X_final = X_final[~duplicated_indices]
-    y_final = y_final[~duplicated_indices]
-    test_data_final = test_data_final[~duplicated_indices]
-    '''
-    #print('duplicata', y_train)
-    
     # Train a classifier, save the model, and generate score tables and metrics
     clf = better_model(X_train, y_train, X_test, y_test, partial_folds+'/model_'+names+'.sav', tuning=False)      
     fitting(test_data, 'Score_'+names, clf, X_test, y_test, 
@@ -342,15 +295,11 @@ def partial_models2(index, datasets, names, datasets2, names2, train_edges, test
     """
     n_cpu = 1
     # Read characteristics data from CSV file and set index
-    #print('data', names, names2)
     carac = pd.read_csv(datasets, sep=",")
     carac.set_index(index, inplace=True)
     carac2 = pd.read_csv(datasets2, sep=",")
     carac2.set_index(index, inplace=True)
     
-    #print('aq', carac, carac2)
-
-    #print(carac)
     # Check if 'label' column exists in carac and drop it if present
     if 'label' in carac.columns:
         carac = carac.drop(columns='label')
@@ -361,22 +310,7 @@ def partial_models2(index, datasets, names, datasets2, names2, train_edges, test
     # Create training, testing, and final testing datasets
     X_train, y_train, X_test, y_test, test_data, X_final, y_final, test_data_final = \
         make_trains(train_edges, test_edges, final_test, carac, carac2)
-    '''
-    duplicated_indices = X_train.duplicated(keep='first')
-    X_train = X_train[~duplicated_indices]
-    y_train = y_train[~duplicated_indices]
 
-    duplicated_indices = X_test.duplicated(keep='first')
-    X_test = X_test[~duplicated_indices]
-    y_test = y_test[~duplicated_indices]
-    test_data = test_data[~duplicated_indices]
-
-    duplicated_indices = X_final.duplicated(keep='first')
-    X_final = X_final[~duplicated_indices]
-    y_final = y_final[~duplicated_indices]
-    test_data_final = test_data_final[~duplicated_indices]
-    '''
-    #print(X_train)
     # Train a classifier, save the model, and generate score tables and metrics
     clf = better_model(X_train, y_train, X_test, y_test, partial_folds+'/model_'+names+'_'+names2+'.sav')      
     fitting(test_data, 'Score_'+names+'_'+names2, clf, X_test, y_test, 
@@ -405,18 +339,13 @@ def concat_data_models(datas, output, name):
     
     # Merge the first two datasets on the 'nameseq' column and drop the redundant 'Label_x'
     merged_train = merged_train.merge(merged_trainB, on='nameseq')
-    #print(merged_train)
-    #f(merged_train.columns)
     merged_train = merged_train.drop(columns=['Label_x'], axis=1)
 
     # Iterate through the remaining dataset files and merge them, dropping the 'Label' column each time
     for k in range(2, len(datas)):
         merged_trainB = pd.read_csv(datas[k], sep=',')
-        #print(merged_trainB.columns, merged_train.columns)
         merged_trainB = merged_trainB.drop(columns=['Label'], axis=1)
-        #print(merged_train, merged_trainB)
         merged_train = merged_train.merge(merged_trainB, on='nameseq')
-        #merged_train = merged_train.drop(columns=['Label'], axis=1)
 
     # Extract the 'nameseq' and 'Label_y' columns as final training data
     merged_nameseq = merged_train[['nameseq']].copy()
@@ -516,11 +445,8 @@ def build_usability_report(generated_plt=[], report_name="usability.pdf", direct
 
     report.insert_doc_header(REPORT_USABILITY_TITLE_BINARY, logo_fig=os.path.join(root_dir, "img/BioAutoML.png"))
     report.insert_text_on_doc(REPORT_USABILITY_DESCRIPITION, font_size=14)
-
-    #report.insert_figure_on_doc(generated_plt['precision'])
     report.insert_text_on_doc(REPORT_1, font_size=14)
-    
-    #report.insert_figure_on_doc(generated_plt['coverage'])
+   
     report.insert_text_on_doc(REPORT_1, font_size=14)
     report.build()
 
@@ -552,6 +478,7 @@ def extrac_features_topology(train_edges, edges, output):
     feat_output = output+'/feat_topology_P.csv'
     graph_feat_trainP.to_csv(feat_output, index=True)
 
+    
     # Create a graph from training edges (considering all edges, including negative)
     G_trN = make_graph_all(train_edges, edges)
     data_nodes_trainN = graph_ext(G_trN)
@@ -564,9 +491,7 @@ def extrac_features_topology(train_edges, edges, output):
     # Save the graph features to a CSV file
     feat_output = output+'/feat_topology_N.csv'
     graph_feat_trainN.to_csv(feat_output, index=True)
-    
-    
-    
+     
     '''
     G_trN = make_graph_N(train_edges, edges)
     data_nodes_trainN = graph_ext(G_trN)
@@ -605,7 +530,7 @@ def feat_eng(input_interactions_train, sequences_dictionary, stype, n_cpu, foutp
     global train_edges_output,  test_edges_output, final_edges_output, partial_folds, output_folds, output_folds_number, features_amino
     
     #extrac_topo_features = False
-    extrac_math_featuresB = False
+    extrac_math_featuresB = True
     output_folds = foutput+'/folds_and_topology_feats'
     make_fold(output_folds)
 
@@ -615,7 +540,6 @@ def feat_eng(input_interactions_train, sequences_dictionary, stype, n_cpu, foutp
     print('Make the folds')
 
     edges = input_interactions_train[input_interactions_train.columns]
-    #fprint(input_interactions_train.columns)
     
     train_edges_output = []
     test_edges_output = []
@@ -661,37 +585,21 @@ def feat_eng(input_interactions_train, sequences_dictionary, stype, n_cpu, foutp
     # Selecionar a primeira coluna como índice para os conjuntos de dados restantes
             df_first = pd.read_csv(datasets_extr[0], sep=',')
             index_column = df_first.columns[0]
-            #print(index_column)
             # Iterar pelos conjuntos de dados restantes
             for i in range(5, 6+6):
                 # Carregar o conjunto de dados
-                #print(i, datasets_extr)
-                print('aq2',datasets_extr[i])
                 df = pd.read_csv(datasets_extr[i], sep=',')
                 df['nameseq'] =  df_first[index_column]
 
                 # Definir a primeira coluna como índice
                 df.set_index(index_column, inplace=True)
-                print('novas feats com nome', df)
-                # Salvar o conjunto de dados com o mesmo nome (substituindo o original)
                 df.to_csv(datasets_extr[i], index=True)
-        
-
-    #datasets_extr = [] ####################### AQUI ###########################
-    #names_math = []
-    #names_math_feat=['Shannon', 'Tsallis_23', 'Tsallis_30', 'Tsallis_40',
-    #                 'ComplexNetworks', 'kGap_di', 'AAC', 'DPC']
-
-    #for i in features_amino:
-    #    names_math.append(names_math_feat[i-1])
-    #    datasets_extr.append(foutput+'/extructural_feats/'+names_math_feat[i-1]+'.csv')    
-        
+                 
 
 def fit_mod(input_interactions_train, sequences_dictionary, n_cpu, foutput):
     parcial_models_cond = True
     final_model = True
-    
-    
+        
     datasets_extr = []
     names_math = []    
     
@@ -744,10 +652,7 @@ def fit_mod(input_interactions_train, sequences_dictionary, n_cpu, foutput):
     
     names_math.append('partial_4_protein')
     datasets_extr.append(foutput+'/extructural_feats/'+'partial_4_protein'+'.csv')
-    
-    
-
-       
+           
 
     datasets_extr2 = []
     names_math2 = []
@@ -805,9 +710,6 @@ def fit_mod(input_interactions_train, sequences_dictionary, n_cpu, foutput):
     datasets_extr2.append(foutput+'/extructural_feats/'+'partial_4_dna'+'.csv')
     
     
-    
-
-    
     datasets_topo = []
     names_topo = []
     for p in range(num_folds):            
@@ -819,13 +721,11 @@ def fit_mod(input_interactions_train, sequences_dictionary, n_cpu, foutput):
         df2 = pd.read_csv(df2)
         #df3 = pd.read_csv(df3)
         
-        
         dfs = []
         dfs.append(df1)
         dfs.append(df2)
         #dfs.append(df3)
         
-
         result_df = pd.merge(dfs[0], dfs[1], left_index=True, right_index=True)
         result_df = result_df.drop(columns=['Node_y'])
         result_df = result_df.rename(columns={'Node_x': 'Node'})
@@ -834,66 +734,24 @@ def fit_mod(input_interactions_train, sequences_dictionary, n_cpu, foutput):
         result_df = result_df.drop(columns=['Node_y'])
         result_df = result_df.rename(columns={'Node_x': 'Node'})
         '''
-        
-        #print('topo_df', result_df)
+
         result_df.to_csv(foutput+'/folds_and_topology_feats/fold'+str(p+1)+'/feat_'+'topology'+'.csv')
         datasets_topo.append(foutput+'/folds_and_topology_feats/fold'+str(p+1)+'/feat_'+'topology'+'.csv')
         names_topo.append('topology')
      
-            
-
-
+           
     if parcial_models_cond:                 
         for p in range(num_folds): 
-            #print(datasets_topo[p])
             carac = pd.read_csv(datasets_topo[p], sep=",")
-
             carac.set_index('Node', inplace=True)
             carac2 = pd.read_csv(datasets_topo[p], sep=",")
             carac2.set_index('Node', inplace=True)
-            #print(carac2)
 
             # Check if 'label' column exists in carac and drop it if present
             if 'label' in carac.columns:
                 carac = carac.drop(columns='label')
             if 'label' in carac2.columns:
                 carac2 = carac2.drop(columns='label')
-
-            X_tr, y_tr, X_te, y_te, te_data, X_fi, y_fi, te_data_final = \
-                make_trains(train_edges_output[p], test_edges_output[p], final_edges_output[p], carac, carac)
-
-            #X_tr, y_tr, sm = imbalanced_function(xgb.XGBClassifier(random_state=43), X_tr, y_tr)
-            print('aaaaaaaaa')
-
-
-            '''
-            # Suponha que train_edges_output[p] seja o caminho para o arquivo CSV
-            caminho_do_arquivo = train_edges_output[p]
-
-            # Carregue o dataset original
-            dataset_original = pd.read_csv(caminho_do_arquivo)
-
-            # Separando as features (X) e os rótulos (y)
-            X = dataset_original.drop('Label', axis=1)
-            y = dataset_original['Label']
-
-            # Aplicando o RandomUnderSampler
-            sm = RandomUnderSampler(random_state=42)
-            #print(X, y)
-            X_resampled, y_resampled = sm.fit_resample(X, y)
-
-            # Criando um novo DataFrame com os dados resampleados
-            dataset_resampleado = pd.DataFrame(X_resampled, columns=X.columns)
-            dataset_resampleado['Label'] = y_resampled
-
-            # Salvar o DataFrame resampleado de volta no lugar original
-            dataset_resampleado.to_csv(caminho_do_arquivo, index=False)
-
-
-            #print(dataset_resampleado)
-            '''
-
-            #train_edges_output[p], train_edges_output[p] = sm.fit_resample(train_edges_output[p], train_edges_output[p])
 
             trains = []
             tests = []  
@@ -903,7 +761,6 @@ def fit_mod(input_interactions_train, sequences_dictionary, n_cpu, foutput):
             tests.append(partial_folds[p]+'/data_test_'+names_topo[0]+'.csv')
 
             for j in range(len(datasets_extr)):
-                #print(j, datasets_extr, datasets_extr2)
                 partial_models2('nameseq', datasets_extr[j], names_math[j], datasets_extr2[j], names_math2[j], train_edges_output[p], 
                                test_edges_output[p], final_edges_output[p], partial_folds[p])
                 trains.append(partial_folds[p]+'/data_train_'+names_math[j]+'_'+names_math2[j]+'.csv')
@@ -917,17 +774,7 @@ def fit_mod(input_interactions_train, sequences_dictionary, n_cpu, foutput):
 
             X_f = final_X_train
             y_f = final_y_train
-            '''
-            X_train = X_f
-            y_train = y_f
 
-            # Aplicando o RandomUnderSampler
-            sm = RandomUnderSampler(random_state=42)
-            X_f, y_f = sm.fit_resample(X_f, y_f)
-            X_train = X_f
-            y_train = y_f
-            '''
-            #print('final data', X_f, y_f)
             clf = better_model(X_f, y_f, final_X_test, final_y_test, 
                                output_folds_number[p]+'/model_final.sav', tuning=True)
 
@@ -1013,21 +860,9 @@ if __name__ == '__main__':
     feat_eng(input_interactions_train, sequences_dictionary_protein, stype[1], n_cpu, foutput)
     fit_mod(input_interactions_train, sequences_dictionary_protein, n_cpu, foutput)
     
-    #python BioPrediction.py -input_interactions_train data/dataset_1/LPI_new.csv -sequences_dictionary_protein data/dataset_1/protein_Sequence.txt -sequences_dictionary_rna data/dataset_1/lncRNA_Sequence.txt -output test_rna_new
-    
-    #python BioPrediction.py -input_interactions_train data/dataset_4/int.csv -sequences_dictionary_protein data/dataset_4/output_proteins.fasta -sequences_dictionary_rna data/dataset_4/output_dna.fasta -output test_rna_new4
-    
-    #python BioPrediction.py -input_interactions_train data/NPInter_pairs.csv -sequences_dictionary_protein data/NPInter_proteins_seq.fa -sequences_dictionary_rna data/NPInter_dna_seq.fa -output test_rna_tipo2
-    
-    #python BioPrediction.py -input_interactions_train data/RPI2241_pairs.csv -sequences_dictionary_protein data/RPI2241_protein_seq.fa -sequences_dictionary_rna data/RPI2241_dna_seq.fa -output test_rna_2241
-    
-        #python BioPrediction.py -input_interactions_train data/RPI2241_pairs.csv -sequences_dictionary_protein data/RPI2241_protein_seq.fa -sequences_dictionary_rna data/RPI2241_dna_seq.fa -output test_rna_2241_2
-    
-    #python BioPrediction.py -input_interactions_train data/RPI369/RPI369_pairs.csv -sequences_dictionary_protein data/RPI369/RPI369_protein_seq.fa -sequences_dictionary_rna data/RPI369/RPI369_dna_seq.fa -output test_rna_369
-    
-        #python BioPrediction.py -input_interactions_train data/RPI1807/RPI1807_pairs.csv -sequences_dictionary_protein data/RPI1807/RPI1807_protein_seq.fa -sequences_dictionary_rna data/RPI1807/RPI1807_dna_seq.fa -output test_rna_RPI1807_final
-    
-    #python BioPrediction.py -input_interactions_train data/NPInter/NPInter_pairs.csv -sequences_dictionary_protein data/NPInter/NPInter_protein_seq.fa -sequences_dictionary_rna data/NPInter/NPInter_dna_seq.fa -output test_rna_NPI
+
     
     
-    #python BioPrediction.py -input_interactions_train data/RPI1807/RPI1807_pairs.csv -sequences_dictionary_protein data/RPI1807/RPI1807_protein_seq.fa -sequences_dictionary_rna data/RPI1807/RPI1807_dna_seq.fa -output test_rna_RPI1807_CERTO
+    # You can use this example to run the BioPrediction
+    
+    #python BioPrediction.py -input_interactions_train datasets/exp_1/RPI369/RPI369_pairs.csv -sequences_dictionary_protein datasets/exp_1/RPI369/RPI369_protein_seq.fa -sequences_dictionary_rna datasets/exp_1/RPI369/RPI369_dna_seq.fa -output test_rna_369

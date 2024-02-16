@@ -76,11 +76,6 @@ def group_feats(fasta_file_path, output):
 
     print(f'Data saved to {csv_file_path}')
 
-
-
-
-
-
 amino_mappings = {
     "H1": {"A": 0.62, "C": 0.29, "D": -0.9, "E": -0.74, "F": 1.19, "G": 0.48, "H": -0.4, "I": 1.38,
            "K": -1.5, "L": 1.06, "M": 0.64, "N": -0.78, "P": 0.12, "Q": -0.85, "R": -2.53, "S": -0.18,
@@ -113,8 +108,6 @@ def fasta_to_dataframe(fasta_file):
     return df
 
 def prop_qf(data, amino_mappings, path):
-    #data = fasta_to_dataframe(preprocessed_fasta)
-
 
     # Criar uma lista para armazenar os dados
     data_list = []
@@ -141,7 +134,6 @@ def prop_qf(data, amino_mappings, path):
 
             # Adicionar o DataFrame ao DataFrame resultante
             result_df = pd.concat([result_df, df])
-        print(result_df)
         result_df = result_df.dropna(axis=1)
         result_df.index.name = 'nameseq'  # Define o nome do índice
         result_df.reset_index(inplace=True)  # Move o índice para uma coluna
@@ -151,7 +143,6 @@ def prop_qf(data, amino_mappings, path):
 def prop_qf_mean(data, amino_mappings, path):
     # Criar uma lista para armazenar os dados
     data_list = []
-    print('foiiiiiiiiiiiii')
 
     # Iterar sobre as linhas do DataFrame
     for index, row in data.iterrows():
@@ -213,7 +204,6 @@ def prop_qf_mean(data, amino_mappings, path):
 
     df = pd.DataFrame(data_list, columns=columns)
     output = os.path.join(path, 'Mean_feat.csv')
-    print(output)
     df.to_csv(output, index=False)
 
 def extrac_math_features(features_amino, sequences, stype, path):
