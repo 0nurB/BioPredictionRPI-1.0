@@ -4,7 +4,7 @@
 ![Status](https://img.shields.io/badge/status-up-brightgreen)
 
 <h1 align="center">
-  <img src="https://github.com/0nurB/BioPredictionRPI-1.0/blob/main/misc/img/1.png" alt="BioPrediction" width="500">
+  <img src="https://github.com/0nurB/BioPredictionRPI-1.0/main/misc/img/1.png" alt="BioPrediction" width="500">
 </h1>
 
 <h4 align="center">BioPrediction: Democratizing Machine Learning in the Study of Molecular Interactions</h4>
