@@ -41,7 +41,7 @@ Given the increasing number of biological sequences stored in databases, there i
 * BioPrediction does not require specialist human assistance.
 
 <h1 align="center">
-  <img src="https://github.com/Bonidia/BioPrediction/blob/main/misc/img/workflow.png" alt="BioPrediction-Flowchart" width="600">
+  <img src="https://github.com/0nurB/BioPredictionRPI-1.0/blob/main/overall.png" alt="BioPrediction-Flowchart" width="600"> 
 </h1>
 
 
