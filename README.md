@@ -4,7 +4,7 @@
 ![Status](https://img.shields.io/badge/status-up-brightgreen)
 
 <h1 align="center">
-  <img src="https://github.com/Bonidia/BioPrediction/blob/main/misc/img/bioprediction-logo.png" alt="BioPrediction" width="500">
+  <img src="https://github.com/0nurB/BioPredictionRPI-1.0/blob/main/img/2.png" alt="BioPrediction" width="500">
 </h1>
 
 <h4 align="center">BioPrediction: Democratizing Machine Learning in the Study of Molecular Interactions</h4>
@@ -24,13 +24,13 @@
 
 ## Main Reference:
 
-**Published paper (in Portuguese):** [ENIAC 2023 Anals](https://sol.sbc.org.br/index.php/eniac/article/view/25726/25542)
+**Published paper:** still not published
 
 BioPrediction is part of a bigger project which proposes to democratize Machine Learning in for analysis, study and control of epidemics and pandemics. [Take a look!!!](http://autoaipandemics.icmc.usp.br)
 
 ## Abstract
 
-Given the increasing number of biological sequences stored in databases, there is a large source of information that can benefit several sectors such as agriculture and health. Machine Learning (ML) algorithms can extract useful and new information from these data, increasing social and economic benefits, in addition to productivity. However, the categorical and unstructured nature of biological sequences makes this process difficult, requiring ML expertise. In this paper, we propose and experimentally evaluate an end-to-end automated ML-based framework, named BioPrediction, able to identify implicit interactions between sequences, e.g., long non-coding RNA and protein pairs, without the need for end-to-end ML expertise. Our experimental results show that the proposed framework can induce ML models with high predictive accuracy, between 77% and 91%, which are competitive with state-of-the-art tools.
+Given the increasing number of biological sequences stored in databases, there is a large source of information that can benefit several sectors such as agriculture and health. Machine Learning (ML) algorithms can extract useful and new information from these data, increasing social and economic benefits, in addition to productivity. However, the categorical and unstructured nature of biological sequences makes this process difficult, requiring ML expertise. In this paper, we propose and experimentally evaluate an end-to-end automated ML-based framework, named BioPrediction, able to identify implicit interactions between sequences, e.g., long non-coding RNA and protein pairs, without the need for end-to-end ML expertise.
 
 * First study to propose an automated feature engineering and model training pipeline to classify interactions between biological sequences;
     
@@ -41,7 +41,7 @@ Given the increasing number of biological sequences stored in databases, there i
 * BioPrediction does not require specialist human assistance.
 
 <h1 align="center">
-  <img src="https://github.com/Bonidia/BioPrediction/blob/main/misc/img/workflow.png" alt="BioPrediction-Flowchart" width="600">
+  <img src="https://github.com/0nurB/BioPredictionRPI-1.0/blob/main/img/overall.png" alt="BioPrediction-Flowchart" width="600"> 
 </h1>
 
 
@@ -59,9 +59,9 @@ Given the increasing number of biological sequences stored in databases, there i
 Installing BioPrediction using Miniconda to manage its dependencies, e.g.:
 
 ```sh
-$ git clone https://github.com/Bonidia/BioPrediction.git BioPrediction
+$ git clone https://github.com/0nurB/BioPredictionRPI-1.0.git BioPredictionRPI
 
-$ cd BioPrediction
+$ cd BioPredictionRPI
 
 $ git submodule init
 
@@ -117,26 +117,18 @@ To run the code (Example): $ python Bioprediction.py -h
 
 where:
 
- -input1_fasta_train: txt or fasta format file with the sequences, e.g., data/dataset_1/lncRNA_Sequence.txt
- -input1_fasta_test:  txt or fasta format file with the sequences, e.g., data/dataset_1/lncRNA_Sequence.txt
- -label_1:            the class label for this sequence type, e.g., lncRNA
- -sequence_type1:     type of biological sequence,  e.g., RNA
+ -input_interactions_train:  csv format file with the interation matrix, e.g., datasets/exp_1/RPI369/RPI369_pairs.csv
+ -input_interactions_test:  csv format file with the interation matrix, e.g., datasets/exp_1/RPI369/RPI369_test_pairs.csv
+ -sequences_dictionary_protein: txt or fasta format file with the sequences, e.g., datasets/exp_1/RPI369/RPI369_protein_seq.fa
+ -sequences_dictionary_rna: txt or fasta format file with the sequences, e.g., datasets/exp_1/RPI369/RPI369_dna_seq.fa
 
- -input2_fasta_train: txt or fasta format file with the sequences, e.g., data/dataset_1/protein_Sequence.txt
- -input2_fasta_test:  txt or fasta format file with the sequences, e.g., data/dataset_1/protein_Sequence.txt
- -label_2:            the class label for this sequence type, e.g., enzymes
- -sequence_type2:     type of biological sequence,  e.g., protein
-
- -interaction_table:  csv format file with the interation matrix, e.g., data/dataset_1/protein_Sequence.txt
  -output: output path, e.g., experiment_1
 
  -n_cpu:  number of cpus - default = 1
  -estimations: number of estimations - default = 10
 
-
 execution example:
-$ python Bioprediction.py -input1_fasta_train data/dataset_1/lncRNA_Sequence.txt -label_1 LncRNA -sequence_type1 DNA -input2_fasta_train data/dataset_1/protein_Sequence.txt -label_2 rProtein -sequence_type2 Protein -interaction_table data/dataset_1/LPI.csv -output results1
-
+python BioPrediction.py -input_interactions_train datasets/exp_1/RPI369/RPI369_pairs.csv -sequences_dictionary_protein datasets/exp_1/RPI369/RPI369_protein_seq.fa -sequences_dictionary_rna datasets/exp_1/RPI369/RPI369_dna_seq.fa -output exp_369
 
 Note Inserting a test dataset is optional.
 ```
