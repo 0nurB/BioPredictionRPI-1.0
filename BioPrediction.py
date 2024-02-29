@@ -276,6 +276,17 @@ def partial_models(index, datasets, names, train_edges, test_edges, final_test, 
             partial_folds+'/metrics_'+names+'.csv')        
     fitting(test_data_final, 'Score_'+names, clf, X_final, y_final,
             partial_folds+'/data_test_'+names+'.csv')
+    
+    """
+    if isinstance(candidates, pd.DataFrame):
+        columns = candidates.columns
+        # scores = clf_fit.predict_proba(X_test.values)[:, 1]
+    """
+    
+    y_train = pd.DataFrame(y_train)
+    y_train.rename(columns={y_train.columns[0]: 'Label_y'}, inplace=True)
+    generated_plt = interp_shap(clf, X_train, y_train, partial_folds, name = names.replace('_protein', '')) 
+    build_interpretability_report(generated_plt=generated_plt, directory=partial_folds, name = names.replace('_protein', ''))
 
 def partial_models2(index, datasets, names, datasets2, names2, train_edges, test_edges, final_test, partial_folds):
     """
@@ -311,6 +322,7 @@ def partial_models2(index, datasets, names, datasets2, names2, train_edges, test
     X_train, y_train, X_test, y_test, test_data, X_final, y_final, test_data_final = \
         make_trains(train_edges, test_edges, final_test, carac, carac2)
 
+
     # Train a classifier, save the model, and generate score tables and metrics
     clf = better_model(X_train, y_train, X_test, y_test, partial_folds+'/model_'+names+'_'+names2+'.sav')      
     fitting(test_data, 'Score_'+names+'_'+names2, clf, X_test, y_test, 
@@ -318,6 +330,20 @@ def partial_models2(index, datasets, names, datasets2, names2, train_edges, test
             partial_folds+'/metrics_'+names+'_'+names2+'.csv')        
     fitting(test_data_final, 'Score_'+names+'_'+names2, clf, X_final, y_final,
             partial_folds+'/data_test_'+names+'_'+names2+'.csv')
+    """
+    print(X_train.columns)
+    if isinstance(candidates, pd.DataFrame):
+        columns = candidates.columns
+        candidates_data = candidates.merge(carac2, left_on=columns[1], right_index=True).merge(carac, left_on=columns[0], right_index=True)
+        candidates_data = candidates_data.drop(columns=['ProteinA', 'ProteinB', 'label.2', 'label.1_y'])
+        score = clf.predict_proba(candidates_data)
+        print(score)
+    """
+    
+    y_train = pd.DataFrame(y_train)
+    y_train.rename(columns={y_train.columns[0]: 'Label_y'}, inplace=True)
+    generated_plt = interp_shap(clf, X_train, y_train, partial_folds, name = names.replace('_protein', '')) 
+    build_interpretability_report(generated_plt=generated_plt, directory=partial_folds, name = names.replace('_protein', ''))
     
     
 def concat_data_models(datas, output, name):
@@ -359,7 +385,7 @@ def concat_data_models(datas, output, name):
     
     return final_X_train, final_y_train, merged_nameseq
 
-def interp_shap(model, X_test, X_label, output, path='explanations'):
+def interp_shap(model, X_test, X_label, output, name = '', path='explanations', water = False):
     """
     Generate various types of SHAP interpretation graphs for a given model and dataset.
     
@@ -380,7 +406,7 @@ def interp_shap(model, X_test, X_label, output, path='explanations'):
     explainer = shap.TreeExplainer(model, feature_perturbation="tree_path_dependent")
     
     # Calculate SHAP values and potentially transform labels based on model type.
-    shap_values, X_label = type_model(explainer, model, X_test.values, X_label)
+    shap_values, X_label = type_model(explainer, model, X_test, X_label)
     
     if not os.path.exists(path):
         print(f"Creating explanations directory: {path}...")
@@ -388,14 +414,15 @@ def interp_shap(model, X_test, X_label, output, path='explanations'):
     else:
         print(f"Directory {path} already exists. Will proceed using it...")
 
-    generated_plt['bar_graph'] = [shap_bar(shap_values, path, fig_name='bar_graph')]
-    generated_plt['beeswarm_graph'] = [shap_beeswarm(shap_values, path, fig_name='beeswarm_graph')]
-    generated_plt['waterfall_graph'] = shap_waterf(explainer, model, X_test.values, X_label, path)
+    generated_plt['bar_graph'] = [shap_bar(shap_values, path, fig_name='bar_graph'+name)]
+    generated_plt['beeswarm_graph'] = [shap_beeswarm(shap_values, path, fig_name='beeswarm_graph'+name)]
+    #if water == True:
+    generated_plt['waterfall_graph'] = shap_waterf(explainer, model, X_test, X_label, path)
     return generated_plt
 
 
    
-def build_interpretability_report(generated_plt=[], report_name="interpretability.pdf", directory="."):
+def build_interpretability_report(generated_plt=[], report_name="interpretability.pdf", directory=".", name = '', water = False):
     """
     Build an interpretability report by combining generated SHAP interpretation graphs into a PDF report.
     
@@ -404,6 +431,9 @@ def build_interpretability_report(generated_plt=[], report_name="interpretabilit
     - report_name: The name of the PDF report to be generated (default is "interpretability.pdf").
     - directory: The directory where the PDF report will be saved (default is the current directory).
     """
+    if name != '':
+        report_name = name + '_' + report_name 
+    
     report = Report(report_name, directory=directory)
     root_dir = os.path.abspath(os.path.join(__file__, os.pardir))
 
@@ -415,7 +445,7 @@ def build_interpretability_report(generated_plt=[], report_name="interpretabilit
 
     report.insert_figure_on_doc(generated_plt['beeswarm_graph'])
     report.insert_text_on_doc(REPORT_SHAP_BEESWARM_BINARY, font_size=12)
-
+    
     report.insert_figure_on_doc(generated_plt['waterfall_graph'])
     report.insert_text_on_doc(REPORT_SHAP_WATERFALL_BINARY, font_size=12)
 
@@ -529,8 +559,8 @@ def feat_eng(input_interactions_train, sequences_dictionary, stype, n_cpu, foutp
     
     global train_edges_output,  test_edges_output, final_edges_output, partial_folds, output_folds, output_folds_number, features_amino
     
-    #extrac_topo_features = False
-    extrac_math_featuresB = True
+    extrac_topo_features = False
+    extrac_math_featuresB = False
     output_folds = foutput+'/folds_and_topology_feats'
     make_fold(output_folds)
 
@@ -581,22 +611,17 @@ def feat_eng(input_interactions_train, sequences_dictionary, stype, n_cpu, foutp
     if extrac_math_featuresB:  
         datasets_extr, names_math = extrac_math_features(features_amino, sequences_dictionary, stype, feat_path)
         if stype == 0:
-         
-    # Selecionar a primeira coluna como índice para os conjuntos de dados restantes
             df_first = pd.read_csv(datasets_extr[0], sep=',')
             index_column = df_first.columns[0]
-            # Iterar pelos conjuntos de dados restantes
             for i in range(5, 6+6):
-                # Carregar o conjunto de dados
                 df = pd.read_csv(datasets_extr[i], sep=',')
                 df['nameseq'] =  df_first[index_column]
 
-                # Definir a primeira coluna como índice
                 df.set_index(index_column, inplace=True)
                 df.to_csv(datasets_extr[i], index=True)
                  
 
-def fit_mod(input_interactions_train, sequences_dictionary, n_cpu, foutput):
+def fit_mod(input_interactions_train, sequences_dictionary, n_cpu, foutput, candidates, extrac_topo_features = False):
     parcial_models_cond = True
     final_model = True
         
@@ -610,7 +635,6 @@ def fit_mod(input_interactions_train, sequences_dictionary, n_cpu, foutput):
     for i in range(len(names_math_feat)):
         datasets_conj.append(foutput+'/extructural_feats/'+names_math_feat[i]+'.csv')
         df.append(pd.read_csv(datasets_conj[i], index_col='nameseq'))
-    #print(df)
     datasets_conj = pd.concat([df[0], df[1], df[2]], axis=1)
     datasets_conj.to_csv(foutput+'/extructural_feats/'+'partial_1_protein'+'.csv')    
     names_math.append('partial_1_protein')
@@ -664,13 +688,11 @@ def fit_mod(input_interactions_train, sequences_dictionary, n_cpu, foutput):
         datasets_conj.append(foutput+'/extructural_feats/'+names_math_feat[i]+'.csv')
         df.append(pd.read_csv(datasets_conj[i], index_col='nameseq'))
     datasets_conj = pd.concat([df[0], df[1], df[2]], axis=1)
-    #print('datasss', datasets_conj)
     datasets_conj.to_csv(foutput+'/extructural_feats/'+'partial_1_dna'+'.csv')
     
     names_math2.append('partial_1_dna')
     datasets_extr2.append(foutput+'/extructural_feats/'+'partial_1_dna'+'.csv')
-    
-    
+     
     datasets_conj = []
     df = []
     names_math_feat=['Rev_kmer_dna', 'Pse_dnc_dna', 'Pse_knc_dna']
@@ -681,7 +703,6 @@ def fit_mod(input_interactions_train, sequences_dictionary, n_cpu, foutput):
     datasets_conj.to_csv(foutput+'/extructural_feats/'+'partial_2_dna'+'.csv')
     names_math2.append('partial_2_dna')
     datasets_extr2.append(foutput+'/extructural_feats/'+'partial_2_dna'+'.csv')
-    
     
     datasets_conj = []
     df = []
@@ -699,8 +720,7 @@ def fit_mod(input_interactions_train, sequences_dictionary, n_cpu, foutput):
     df = []
     names_math_feat=['QNC_dna']
     for i in range(len(names_math_feat)):
-        datasets_conj.append(foutput+'/extructural_feats/'+names_math_feat[i]+'.csv')
-        
+        datasets_conj.append(foutput+'/extructural_feats/'+names_math_feat[i]+'.csv')       
         df.append(pd.read_csv(datasets_conj[i], index_col='nameseq'))
     for i in range(len(df)):
         df[i] = df[i].drop(columns=['label'])
@@ -755,10 +775,10 @@ def fit_mod(input_interactions_train, sequences_dictionary, n_cpu, foutput):
 
             trains = []
             tests = []  
-
-            partial_models('Node', datasets_topo[p], names_topo[0], train_edges_output[p], test_edges_output[p], final_edges_output[p], partial_folds[p])
-            trains.append(partial_folds[p]+'/data_train_'+names_topo[0]+'.csv')
-            tests.append(partial_folds[p]+'/data_test_'+names_topo[0]+'.csv')
+            if extrac_topo_features:
+                partial_models('Node', datasets_topo[p], names_topo[0], train_edges_output[p], test_edges_output[p], final_edges_output[p], partial_folds[p])
+                trains.append(partial_folds[p]+'/data_train_'+names_topo[0]+'.csv')
+                tests.append(partial_folds[p]+'/data_test_'+names_topo[0]+'.csv')
 
             for j in range(len(datasets_extr)):
                 partial_models2('nameseq', datasets_extr[j], names_math[j], datasets_extr2[j], names_math2[j], train_edges_output[p], 
@@ -779,16 +799,20 @@ def fit_mod(input_interactions_train, sequences_dictionary, n_cpu, foutput):
                                output_folds_number[p]+'/model_final.sav', tuning=True)
 
 
-            #generated_plt = interp_shap(clf, final_X_train, final_y_train, output_folds_number[p]) 
-            #build_interpretability_report(generated_plt=generated_plt, directory=output_folds_number[p])
+            generated_plt = interp_shap(clf, final_X_train, final_y_train, output_folds_number[p]) 
+            build_interpretability_report(generated_plt=generated_plt, directory=output_folds_number[p])
 
             output_data = final_predictions(final_X_test, final_y_test, nameseq, clf, output_folds_number[p])
-            #generated_plt = utility(output_data, output_folds_number[p])
-            #build_usability_report(generated_plt, report_name="usability.pdf", directory=output_folds_number[p])
+            generated_plt = utility(output_data, output_folds_number[p])
+            build_usability_report(generated_plt, report_name="usability.pdf", directory=output_folds_number[p])
 
             predictions = clf.predict(final_X_test.values)
             preds_proba = clf.predict_proba(final_X_test.values)[:, 1]
             metrics(predictions, final_y_test, preds_proba, output_folds_number[p]+'/metrics_model_final.csv')
+            
+        if isinstance(candidates, pd.DataFrame):
+            predictions = clf.predict(final_X_test.values)
+                
             
     metrics_output = []
     for p in range(num_folds):
@@ -809,7 +833,10 @@ def fit_mod(input_interactions_train, sequences_dictionary, n_cpu, foutput):
             mean = metricA['Values'].mean()
             std = metricA['Values'].std()
             new_line = {'Metric': i, 'Mean': mean, 'Standard deviation': std}    
-            new_dataframe = new_dataframe.append(new_line, ignore_index=True)
+            #new_dataframe = new_dataframe.append(new_line, ignore_index=True)
+            #new_dataframe = pd.concat([new_dataframe, new_line], ignore_index=True)
+            new_line_df = pd.DataFrame([new_line])
+            new_dataframe = pd.concat([new_dataframe, new_line_df], ignore_index=True)
 
         new_dataframe.to_csv(output_folds+'\cross_validation_metrics.csv', index=False)
         print('Final perform:')
@@ -819,12 +846,14 @@ def fit_mod(input_interactions_train, sequences_dictionary, n_cpu, foutput):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-input_interactions_train', '--input_interactions_train',  
-                        help='path of table with tree columns (firts protein A, secund protein B \
+                        help='path of table with tree columns (firts protein, secund RNA \
                         and third interaction label) e.g., interations_train.txt')
     
     parser.add_argument('-input_interactions_test', '--input_interactions_test', 
-                        help='path of table with tree columns (firts protein A, secund protein B \
+                        help='path of table with tree columns (firts protein, secund RNA \
                         and third interaction label) e.g., interations_test.txt')
+    
+    parser.add_argument('-input_interactions_candidates', '--input_interactions_candidates', help='path of table with two columns (firts protein and secund RNA) of your candidates interactions pairs e.g., candidates.txt', default='')
     
     parser.add_argument('-sequences_dictionary_protein', '--sequences_dictionary_protein', help='all sequences in \
                         the problem in fasta format, e.g., dictionary.fasta')
@@ -838,6 +867,13 @@ if __name__ == '__main__':
     args = parser.parse_args() 
     input_interactions_train = args.input_interactions_train
     input_interactions_test = args.input_interactions_test
+    
+
+    candidates = args.input_interactions_candidates
+    if candidates != '':
+        candidates = pd.read_csv(candidates, sep=',')
+        
+    
     sequences_dictionary_protein = args.sequences_dictionary_protein
     sequences_dictionary_rna = args.sequences_dictionary_rna
     foutput = args.output
@@ -852,16 +888,14 @@ if __name__ == '__main__':
     check_path([sequences_dictionary_protein], 'sequences_dictionary_protein') 
     check_path([sequences_dictionary_rna], 'sequences_dictionary_rna') 
     make_fold(foutput)
-    
-    #print(input_interactions_train)
-    
+      
     stype = [0,1]
     feat_eng(input_interactions_train, sequences_dictionary_rna, stype[0], n_cpu, foutput, extrac_topo_features=True)
     feat_eng(input_interactions_train, sequences_dictionary_protein, stype[1], n_cpu, foutput)
-    fit_mod(input_interactions_train, sequences_dictionary_protein, n_cpu, foutput)
+    fit_mod(input_interactions_train, sequences_dictionary_protein, n_cpu, foutput, candidates, extrac_topo_features = False)
     
 
-    
+
     
     # You can use this example to run the BioPrediction
     
