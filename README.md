@@ -119,6 +119,8 @@ where:
 
  -input_interactions_train:  csv format file with the interation matrix, e.g., datasets/exp_1/RPI369/RPI369_pairs.csv
  -input_interactions_test:  csv format file with the interation matrix, e.g., datasets/exp_1/RPI369/RPI369_test_pairs.csv
+ -input_interactions_candidates:  csv format file with the interation candidates to the prediction, e.g., datasets/exp_1/RPI369/RPI369_candidates_pairs.csv
+
  -sequences_dictionary_protein: txt or fasta format file with the sequences, e.g., datasets/exp_1/RPI369/RPI369_protein_seq.fa
  -sequences_dictionary_rna: txt or fasta format file with the sequences, e.g., datasets/exp_1/RPI369/RPI369_dna_seq.fa
 
