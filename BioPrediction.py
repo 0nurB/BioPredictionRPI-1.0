@@ -559,7 +559,7 @@ def feat_eng(input_interactions_train, sequences_dictionary, stype, n_cpu, foutp
     
     global train_edges_output,  test_edges_output, final_edges_output, partial_folds, output_folds, output_folds_number, features_amino
     
-    extrac_topo_features = False
+    # extrac_topo_features = False
     extrac_math_featuresB = False
     output_folds = foutput+'/folds_and_topology_feats'
     make_fold(output_folds)
@@ -861,6 +861,11 @@ if __name__ == '__main__':
     parser.add_argument('-sequences_dictionary_rna', '--sequences_dictionary_rna', help='all sequences in \
                         the problem in fasta format, e.g., dictionary.fasta')
     
+    parser.add_argument('-sequences_dictionary_rna', '--sequences_dictionary_rna', help='all sequences in \
+                        the problem in fasta format, e.g., dictionary.fasta')
+    
+    parser.add_argument('-topology_features', '--topology_features', help='uses topology features to characterization of the sequences, e.g., yes or no', default='no')
+    
     parser.add_argument('-output', '--output', help='resutls directory, e.g., result/')
     parser.add_argument('-n_cpu', '--n_cpu', default=1, help='number of cpus - default = 1')
     
@@ -876,6 +881,13 @@ if __name__ == '__main__':
     
     sequences_dictionary_protein = args.sequences_dictionary_protein
     sequences_dictionary_rna = args.sequences_dictionary_rna
+    extrac_topo_features = args.topology_features
+    
+    if extrac_topo_features == yes or extrac_topo_features == Yes:
+        extrac_topo_features = True
+    else:
+        extrac_topo_features = False
+        
     foutput = args.output
     n_cpu = args.n_cpu
     
@@ -892,7 +904,7 @@ if __name__ == '__main__':
     stype = [0,1]
     feat_eng(input_interactions_train, sequences_dictionary_rna, stype[0], n_cpu, foutput, extrac_topo_features=True)
     feat_eng(input_interactions_train, sequences_dictionary_protein, stype[1], n_cpu, foutput)
-    fit_mod(input_interactions_train, sequences_dictionary_protein, n_cpu, foutput, candidates, extrac_topo_features = False)
+    fit_mod(input_interactions_train, sequences_dictionary_protein, n_cpu, foutput, candidates, extrac_topo_features = True)
     
 
 
