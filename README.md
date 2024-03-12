@@ -30,7 +30,7 @@ BioPrediction is part of a bigger project which proposes to democratize Machine 
 
 ## Abstract
 
-Given the increasing number of biological sequences stored in databases, there is a large source of information that can benefit several sectors such as agriculture and health. Machine Learning (ML) algorithms can extract useful and new information from these data, increasing social and economic benefits, in addition to productivity. However, the categorical and unstructured nature of biological sequences makes this process difficult, requiring ML expertise. In this paper, we propose and experimentally evaluate an end-to-end automated ML-based framework, named BioPrediction, able to identify implicit interactions between sequences, e.g., long non-coding RNA and protein pairs, without the need for end-to-end ML expertise.
+With the increasing storage of biological sequences, it is urgent to extract information for advances in agriculture and health. The diversity of these sequences poses challenges in information extraction, requiring specialized knowledge in Machine Learning (ML). We introduce BioPrediction, an automated ML framework that creates models to identify interactions between sequences, such as pairs of non-coding RNA (ncRNA) and proteins, human intervention. The results demonstrate its effectiveness across various datasets, compared to models built by experts. This automated approach offers a new pathway to understanding these interactions and disease-related pathways.
 
 * First study to propose an automated feature engineering and model training pipeline to classify interactions between biological sequences;
     
@@ -125,9 +125,6 @@ where:
  -sequences_dictionary_rna: txt or fasta format file with the sequences, e.g., datasets/exp_1/RPI369/RPI369_dna_seq.fa
 
  -output: output path, e.g., experiment_1
-
- -n_cpu:  number of cpus - default = 1
- -estimations: number of estimations - default = 10
 
 execution example:
 python BioPrediction.py -input_interactions_train datasets/exp_1/RPI369/RPI369_pairs.csv -sequences_dictionary_protein datasets/exp_1/RPI369/RPI369_protein_seq.fa -sequences_dictionary_rna datasets/exp_1/RPI369/RPI369_dna_seq.fa -output exp_369
