@@ -170,7 +170,7 @@ def better_model(X_train, y_train, X_test, y_test, output, tuning=False, metric=
         best_model: The best-performing classifier.
     """
     valor_teto = 1e9  # Substitua pelo valor desejado
-    print(X_train)
+    #print(X_train)
     # Substitua valores infinitos ou muito grandes pelo valor teto
     X_train.replace([np.inf, -np.inf, np.nan], valor_teto, inplace=True)
 
@@ -225,7 +225,7 @@ def better_model(X_train, y_train, X_test, y_test, output, tuning=False, metric=
     
     # If tuning is True, perform hyperparameter tuning for the best model
     if tuning:
-        print('tuning', best_model)
+        #print('tuning', best_model)
         dt_param_grid = {
         'criterion': ['gini', 'entropy'],
         'splitter': ['best', 'random'],

@@ -74,7 +74,7 @@ def group_feats(fasta_file_path, output):
     csv_file_path = output + '/fq_grups.csv'
     df.to_csv(csv_file_path, index=False)
 
-    print(f'Data saved to {csv_file_path}')
+    #print(f'Data saved to {csv_file_path}')
 
 amino_mappings = {
     "H1": {"A": 0.62, "C": 0.29, "D": -0.9, "E": -0.74, "F": 1.19, "G": 0.48, "H": -0.4, "I": 1.38,
@@ -269,7 +269,7 @@ def extrac_math_features(features_amino, sequences, stype, path):
                     dataset = os.path.join(path, 'QNC_dna' + '.csv')
                     datasets_extr.append(dataset)
                     names_math.append('QNC_dna')
-                    commands.append(['python', 'MathFeature/methods/ExtractionTechniques.py', '-i',
+                    commands.append(['python', 'repDNA/ExtractionTechniques.py', '-i',
                                     preprocessed_fasta, '-o', dataset, '-l', 'DNA',
                                     '-t', 'QNC', '-seq', '1'])
 
@@ -430,7 +430,6 @@ def extrac_math_features(features_amino, sequences, stype, path):
     
     if stype == 1:
         """Feature extraction for aminoacids-based sequences"""   
-        print('aq', features_amino)
         for i in range(len(fasta)):
             file = fasta[i].split('/')[-1]
             if i == 0:  # Train

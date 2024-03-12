@@ -98,7 +98,7 @@ def shap_waterf(explainer, model, X_test, X_label, path):
         shap_values, classes = type_model(explainer, model, subset, classes)
 
         # Choose two samples from the current class.
-        print('shape', subset.shape[0], X_label.label)
+        #print('shape', subset.shape[0], X_label.label)
         numbers = default_rng().choice(range(1, subset.shape[0]-1), size=(6), replace=False)
 
         # Generate waterfall graphs for the selected samples.

@@ -411,8 +411,8 @@ def interp_shap(model, X_test, X_label, output, name = '', path='explanations', 
     if not os.path.exists(path):
         print(f"Creating explanations directory: {path}...")
         os.mkdir(path)
-    else:
-        print(f"Directory {path} already exists. Will proceed using it...")
+    #else:
+        #print(f"Directory {path} already exists. Will proceed using it...")
 
     generated_plt['bar_graph'] = [shap_bar(shap_values, path, fig_name='bar_graph'+name)]
     generated_plt['beeswarm_graph'] = [shap_beeswarm(shap_values, path, fig_name='beeswarm_graph'+name)]
@@ -861,8 +861,6 @@ if __name__ == '__main__':
     parser.add_argument('-sequences_dictionary_rna', '--sequences_dictionary_rna', help='all sequences in \
                         the problem in fasta format, e.g., dictionary.fasta')
     
-    parser.add_argument('-sequences_dictionary_rna', '--sequences_dictionary_rna', help='all sequences in \
-                        the problem in fasta format, e.g., dictionary.fasta')
     
     parser.add_argument('-topology_features', '--topology_features', help='uses topology features to characterization of the sequences, e.g., yes or no', default='no')
     
@@ -883,7 +881,7 @@ if __name__ == '__main__':
     sequences_dictionary_rna = args.sequences_dictionary_rna
     extrac_topo_features = args.topology_features
     
-    if extrac_topo_features == yes or extrac_topo_features == Yes:
+    if extrac_topo_features == 'yes' or extrac_topo_features == 'Yes':
         extrac_topo_features = True
     else:
         extrac_topo_features = False
