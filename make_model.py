@@ -306,11 +306,17 @@ def Score_table(test_data, predictions, scores, scores_name, output):
     model_result = model_result.drop(columns=[columns[0], columns[1]])
 
     # Add columns for predicted labels and the specified scores
-    model_result['PredictedLabel'] = predictions
+    #model_result['PredictedLabel'] = predictions
     model_result[scores_name] = scores
-
+    #print(model_result.columns)
     # Reorder the columns in the desired order
-    model_result = model_result[['nameseq', scores_name, columns[2]]]
+    #print('aqqq')
+    #print(columns, 'the len', len(columns))
+    if 'Label' in test_data.columns:
+        #print(columns, 'the len', len(columns))
+        model_result = model_result[['nameseq', scores_name, columns[2]]]
+    else:
+        model_result = model_result[['nameseq', scores_name]]
     model_result = model_result.sort_index()
 
     # Save the score table DataFrame to a CSV file

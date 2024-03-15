@@ -283,6 +283,21 @@ def partial_models(index, datasets, names, train_edges, test_edges, final_test, 
         # scores = clf_fit.predict_proba(X_test.values)[:, 1]
     """
     
+    if isinstance(candidates, pd.DataFrame):       
+        columns = candidates.columns
+        candidates_names = candidates.copy()
+
+        if 'label' in carac.columns:
+            df = carac.drop(columns=['label'])
+
+        candidates_data = candidates.merge(carac, left_on=columns[1], right_index=True).merge(carac, left_on=columns[0], right_index=True)
+        #print(X_train)
+        candidates_data = candidates_data.drop(columns=['ProteinA', 'ProteinB'])
+        #print(candidates_data)
+        score = clf.predict_proba(candidates_data)[:, 1]
+        predictions=[]
+        Score_table(candidates_names, predictions, score, 'Score_'+names, partial_folds+'/data_candidates_'+names+'.csv')
+    
     y_train = pd.DataFrame(y_train)
     y_train.rename(columns={y_train.columns[0]: 'Label_y'}, inplace=True)
     generated_plt = interp_shap(clf, X_train, y_train, partial_folds, name = names.replace('_protein', '')) 
@@ -330,15 +345,22 @@ def partial_models2(index, datasets, names, datasets2, names2, train_edges, test
             partial_folds+'/metrics_'+names+'_'+names2+'.csv')        
     fitting(test_data_final, 'Score_'+names+'_'+names2, clf, X_final, y_final,
             partial_folds+'/data_test_'+names+'_'+names2+'.csv')
-    """
-    print(X_train.columns)
-    if isinstance(candidates, pd.DataFrame):
+        
+    if isinstance(candidates, pd.DataFrame):       
         columns = candidates.columns
+        candidates_names = candidates.copy()
+
+        if 'label' in carac.columns:
+            df = carac.drop(columns=['label'])
+        if 'label' in carac2.columns:
+            df = carac2.drop(columns=['label'])
         candidates_data = candidates.merge(carac2, left_on=columns[1], right_index=True).merge(carac, left_on=columns[0], right_index=True)
-        candidates_data = candidates_data.drop(columns=['ProteinA', 'ProteinB', 'label.2', 'label.1_y'])
-        score = clf.predict_proba(candidates_data)
-        print(score)
-    """
+        candidates_data = candidates_data.drop(columns=['ProteinA', 'ProteinB'])
+
+        score = clf.predict_proba(candidates_data)[:, 1]
+        predictions=[]
+        Score_table(candidates_names, predictions, score, 'Score_'+names+'_'+names2, partial_folds+'/data_candidates_'+names+'_'+names2+'.csv')
+    
     
     y_train = pd.DataFrame(y_train)
     y_train.rename(columns={y_train.columns[0]: 'Label_y'}, inplace=True)
@@ -346,7 +368,7 @@ def partial_models2(index, datasets, names, datasets2, names2, train_edges, test
     build_interpretability_report(generated_plt=generated_plt, directory=partial_folds, name = names.replace('_protein', ''))
     
     
-def concat_data_models(datas, output, name):
+def concat_data_models(datas, output, name, candidates_bol = False):
     """
     Concatenate data from multiple models and save the final training dataset.
 
@@ -365,20 +387,25 @@ def concat_data_models(datas, output, name):
     
     # Merge the first two datasets on the 'nameseq' column and drop the redundant 'Label_x'
     merged_train = merged_train.merge(merged_trainB, on='nameseq')
-    merged_train = merged_train.drop(columns=['Label_x'], axis=1)
+    if 'Label_x' in merged_train.columns:
+        merged_train = merged_train.drop(columns=['Label_x'], axis=1)
 
     # Iterate through the remaining dataset files and merge them, dropping the 'Label' column each time
     for k in range(2, len(datas)):
         merged_trainB = pd.read_csv(datas[k], sep=',')
-        merged_trainB = merged_trainB.drop(columns=['Label'], axis=1)
+        if 'Label' in merged_trainB.columns:
+            merged_trainB = merged_trainB.drop(columns=['Label'], axis=1)
         merged_train = merged_train.merge(merged_trainB, on='nameseq')
 
     # Extract the 'nameseq' and 'Label_y' columns as final training data
     merged_nameseq = merged_train[['nameseq']].copy()
-    final_y_train = merged_train[['Label_y']].copy()
-    final_X_train = merged_train.drop(columns=['nameseq', 'Label_y'])
-
-    # Save the final training data as CSV files
+    if candidates_bol:
+        final_y_train = pd.DataFrame()
+        final_X_train = merged_train.drop(columns=['nameseq'])
+    else:
+        final_y_train = merged_train[['Label_y']].copy()
+        final_X_train = merged_train.drop(columns=['nameseq', 'Label_y'])
+        
     final_X_train.to_csv(output+'/final_X_'+name+'.csv', index=False) 
     final_y_train.to_csv(output+'/final_y_'+name+'.csv', index=False) 
     merged_nameseq.to_csv(output+'/final_nameseq_'+name+'.csv', index=False)
@@ -559,15 +586,15 @@ def feat_eng(input_interactions_train, sequences_dictionary, stype, n_cpu, foutp
     
     global train_edges_output,  test_edges_output, final_edges_output, partial_folds, output_folds, output_folds_number, features_amino
     
-    # extrac_topo_features = False
-    extrac_math_featuresB = False
+    #extrac_topo_features = False
+    extrac_math_featuresB = True
     output_folds = foutput+'/folds_and_topology_feats'
     make_fold(output_folds)
 
     feat_path = foutput + '/extructural_feats'
     make_fold(feat_path)
 
-    print('Make the folds')
+    #print('Make the folds')
 
     edges = input_interactions_train[input_interactions_train.columns]
     
@@ -634,7 +661,10 @@ def fit_mod(input_interactions_train, sequences_dictionary, n_cpu, foutput, cand
     names_math_feat=['AAC_protein', 'DPC_protein', 'Mean_feat']
     for i in range(len(names_math_feat)):
         datasets_conj.append(foutput+'/extructural_feats/'+names_math_feat[i]+'.csv')
-        df.append(pd.read_csv(datasets_conj[i], index_col='nameseq'))
+        df_p = pd.read_csv(datasets_conj[i], index_col='nameseq')
+        if 'label' in df_p.columns:
+            df_p = df_p.drop(columns='label')
+        df.append(df_p)
     datasets_conj = pd.concat([df[0], df[1], df[2]], axis=1)
     datasets_conj.to_csv(foutput+'/extructural_feats/'+'partial_1_protein'+'.csv')    
     names_math.append('partial_1_protein')
@@ -686,7 +716,10 @@ def fit_mod(input_interactions_train, sequences_dictionary, n_cpu, foutput, cand
     names_math_feat=['NAC_dna', 'DNC_dna', 'TNC_dna']
     for i in range(len(names_math_feat)):
         datasets_conj.append(foutput+'/extructural_feats/'+names_math_feat[i]+'.csv')
-        df.append(pd.read_csv(datasets_conj[i], index_col='nameseq'))
+        df_p = pd.read_csv(datasets_conj[i], index_col='nameseq')
+        if 'label' in df_p.columns:
+            df_p = df_p.drop(columns='label')
+        df.append(df_p)
     datasets_conj = pd.concat([df[0], df[1], df[2]], axis=1)
     datasets_conj.to_csv(foutput+'/extructural_feats/'+'partial_1_dna'+'.csv')
     
@@ -775,21 +808,29 @@ def fit_mod(input_interactions_train, sequences_dictionary, n_cpu, foutput, cand
 
             trains = []
             tests = []  
+            cands = []
             if extrac_topo_features:
                 partial_models('Node', datasets_topo[p], names_topo[0], train_edges_output[p], test_edges_output[p], final_edges_output[p], partial_folds[p])
                 trains.append(partial_folds[p]+'/data_train_'+names_topo[0]+'.csv')
                 tests.append(partial_folds[p]+'/data_test_'+names_topo[0]+'.csv')
-
+                if isinstance(candidates, pd.DataFrame): 
+                    cands.append(partial_folds[p]+'/data_candidates_'+names_topo[0]+'.csv')
+                
             for j in range(len(datasets_extr)):
                 partial_models2('nameseq', datasets_extr[j], names_math[j], datasets_extr2[j], names_math2[j], train_edges_output[p], 
                                test_edges_output[p], final_edges_output[p], partial_folds[p])
                 trains.append(partial_folds[p]+'/data_train_'+names_math[j]+'_'+names_math2[j]+'.csv')
-                tests.append(partial_folds[p]+'/data_test_'+names_math[j]+'_'+names_math2[j]+'.csv')                
-                
+                tests.append(partial_folds[p]+'/data_test_'+names_math[j]+'_'+names_math2[j]+'.csv')         
+                if isinstance(candidates, pd.DataFrame): 
+                    cands.append(partial_folds[p]+'/data_candidates_'+names_math[j]+'_'+names_math2[j]+'.csv')
+                    
             concat_output = output_folds +'/fold'+str(p+1)
+            
             final_X_train, final_y_train, nameseq = concat_data_models(trains, concat_output, 'train')
             final_X_test, final_y_test, nameseq = concat_data_models(tests, concat_output, 'test')
-
+            if isinstance(candidates, pd.DataFrame): 
+                final_X_cand, trash, nameseq_cand = concat_data_models(cands, concat_output, 'cands', True)
+                
             global X_train, y_train
 
             X_f = final_X_train
@@ -811,9 +852,14 @@ def fit_mod(input_interactions_train, sequences_dictionary, n_cpu, foutput, cand
             metrics(predictions, final_y_test, preds_proba, output_folds_number[p]+'/metrics_model_final.csv')
             
         if isinstance(candidates, pd.DataFrame):
-            predictions = clf.predict(final_X_test.values)
-                
-            
+            predictions = clf.predict(final_X_cand)
+            score = clf.predict_proba(final_X_cand)[:, 1]
+            score_name = 'Candidate_score'
+            output_table = output_folds_number[p]+'/candidates_prediction.csv'
+            model_result = nameseq_cand.copy()
+            model_result[score_name] = score
+            model_result.to_csv(output_table, index=False)
+
     metrics_output = []
     for p in range(num_folds):
         metrics_output.append(foutput+'/folds_and_topology_feats/fold'+str(p+1)+'/metrics_model_final.csv')
@@ -907,6 +953,6 @@ if __name__ == '__main__':
 
 
     
-    # You can use this example to run the BioPrediction
+    # You can use this example to run the BioPrediction niuhui
     
-    #python BioPrediction.py -input_interactions_train datasets/exp_1/RPI369/RPI369_pairs.csv -sequences_dictionary_protein datasets/exp_1/RPI369/RPI369_protein_seq.fa -sequences_dictionary_rna datasets/exp_1/RPI369/RPI369_dna_seq.fa -output test_rna_369
+    #python BioPrediction.py -input_interactions_train datasets/exp_1/RPI369/RPI369_pairs.csv -sequences_dictionary_protein datasets/exp_1/RPI369/RPI369_protein_seq.fa -sequences_dictionary_rna datasets/exp_1/RPI369/RPI369_dna_seq.fa -output test_rna_369_1 -input_interactions_candidates datasets\exp_1\RPI369/candidates_pairs.csv
