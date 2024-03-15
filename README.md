@@ -124,6 +124,8 @@ where:
  -sequences_dictionary_protein: txt or fasta format file with the sequences, e.g., datasets/exp_1/RPI369/RPI369_protein_seq.fa
  -sequences_dictionary_rna: txt or fasta format file with the sequences, e.g., datasets/exp_1/RPI369/RPI369_dna_seq.fa
 
+Those dictionaries must contain all sequences in train, test and candidates.
+
  -output: output path, e.g., experiment_1
 
 execution example:
