@@ -22,23 +22,27 @@
 <h1 align="center"></h1>
 
 
-## Main Reference:
+## Main:
 
-**Published paper:** still not published
+**Published paper:** submitted!!!
 
-BioPrediction is part of a bigger project which proposes to democratize Machine Learning in for analysis, study and control of epidemics and pandemics. [Take a look!!!](http://autoaipandemics.icmc.usp.br)
+BioPrediction is part of a bigger project that proposes to democratize Machine Learning for the analysis, study, and control of epidemics and pandemics. [Take a look!!!](http://autoaipandemics.icmc.usp.br)
+
+## Awards
+
+BioPrediction - Project selected to participate in Prototypes for Humanity 2023, during COP28-Dubai, chosen from 3000 entries, from more than 100 countries, standing out among the 100 best, Prototypes for Humanity - COP28-Dubai. [Take a look!!!](https://www.prototypesforhumanity.com/project/bioprediction-framework/)
+
 
 ## Abstract
 
-With the increasing storage of biological sequences, it is urgent to extract information for advances in agriculture and health. The diversity of these sequences poses challenges in information extraction, requiring specialized knowledge in Machine Learning (ML). We introduce BioPrediction, an automated ML framework that creates models to identify interactions between sequences, such as pairs of non-coding RNA (ncRNA) and proteins, human intervention. The results demonstrate its effectiveness across various datasets, compared to models built by experts. This automated approach offers a new pathway to understanding these interactions and disease-related pathways.
+Machine Learning (ML) algorithms have been important tools for the extraction of useful knowledge from biological sequences particularly in healthcare, agriculture, and the environment. However, the categorical and unstructured nature of these sequences requiring usually additional feature engineering
+steps, before an ML algorithm can be efficiently applied. The addition of these steps to the ML algorithm creates a processing pipeline, known as end-to-end ML. Despite the excellent results obtained by applying end-to-end ML to biotechnology problems, the performance obtained depends on the expertise of the user in the components of the pipeline. In this work, we propose an end-to-end ML-based framework called BioPrediction-RPI, which can identify implicit interactions between sequences, such as pairs of non-coding RNA and proteins, without the need for specialized expertise in end-to-end ML. This framework applies feature engineering to represent each sequence by structural and topological features. These features are divided into feature groups and used to train partial models, whose partial decisions are combined into a final decision, which, provides insights to the user by giving an interpretability report. In our experiments, the developed framework was competitive when compared with various expert-created models. We assessed BioPrediction-RPI with 12 datasets when it presented equal or
+better performance than all tools in 40% to 100% of cases, depending on the experiment. Finally, BioPrediction-RPI can fine-tune models based on new data and perform at the same level as ML experts, thus democratizing end-to-end ML and increasing its access to those working in biological sciences.
 
-* First study to propose an automated feature engineering and model training pipeline to classify interactions between biological sequences;
-    
-* The pipeline was mainly tested on datasets regarding lncRNA-protein interactions. The maintainers are further expanding their support to work with other molecules;
-    
-* BioPrediction can accelerate new studies, reducing the feature engineering time-consuming stage and improving the design and performance of ML pipelines in bioinformatics;
-    
-* BioPrediction does not require specialist human assistance.
+* To the best of our knowledge, this is the first study to propose an automated pipeline for feature engineering and model training to classify interactions between biological sequences, competitive with models developed by experts.
+• The pipeline was mainly tested on datasets regarding RNA-Protein interactions.
+• BioPrediction-RPI does not require specialist human assistance.
+• BioPrediction-RPI can accelerate new studies, democratizing the use of ML techniques by non-experts in ML.
 
 <h1 align="center">
   <img src="https://github.com/0nurB/BioPredictionRPI-1.0/blob/main/img/overall.png" alt="BioPrediction-Flowchart" width="600"> 
@@ -117,14 +121,14 @@ To run the code (Example): $ python Bioprediction.py -h
 
 where:
 
- -input_interactions_train:  csv format file with the interation matrix, e.g., datasets/exp_1/RPI369/RPI369_pairs.csv
- -input_interactions_test:  csv format file with the interation matrix, e.g., datasets/exp_1/RPI369/RPI369_test_pairs.csv
- -input_interactions_candidates:  csv format file with the interation candidates to the prediction, e.g., datasets/exp_1/RPI369/RPI369_candidates_pairs.csv
+ -input_interactions_train: CSV format file with the interaction matrix, e.g., datasets/exp_1/RPI369/RPI369_pairs.csv
+ -input_interactions_test: CSV format file with the interaction matrix, e.g., datasets/exp_1/RPI369/RPI369_test_pairs.csv
+ -input_interactions_candidates: CSV format file with the interaction candidates to the prediction, e.g., datasets/exp_1/RPI369/RPI369_candidates_pairs.csv
 
  -sequences_dictionary_protein: txt or fasta format file with the sequences, e.g., datasets/exp_1/RPI369/RPI369_protein_seq.fa
  -sequences_dictionary_rna: txt or fasta format file with the sequences, e.g., datasets/exp_1/RPI369/RPI369_dna_seq.fa
 
-Those dictionaries must contain all sequences in train, test and candidates.
+Those dictionaries must contain all sequences in train, test, and candidates.
 
  -output: output path, e.g., experiment_1
 
@@ -133,12 +137,6 @@ python BioPrediction.py -input_interactions_train datasets/exp_1/RPI369/RPI369_p
 
 Note Inserting a test dataset is optional.
 ```
-
-## Awards
-
-BioPrediction - Project selected to participate in Prototypes for Humanity 2023, during COP28-Dubai, chosen from 3000 entries, from more than 100 countries, standing out among the 100 best, Prototypes for Humanity - COP28-Dubai.
-https://www.prototypesforhumanity.com/project/bioprediction-framework/
-
 
 ## Citation
 
