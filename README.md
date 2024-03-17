@@ -119,7 +119,7 @@ Execute the BioPrediction pipeline with the following command:
 
 ```sh
 ...
-To run the code (Example): $ python Bioprediction.py -h
+To run the code (Example): $ python BioPrediction.py -h
 
 where:
 
