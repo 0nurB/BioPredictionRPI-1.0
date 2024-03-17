@@ -94,7 +94,7 @@ $ export PATH=~/miniconda3/bin:$PATH
 
 ```sh
 
-conda env create -f BioPrediction-env.yml -n bioprediction
+conda create --name bioprediction-rpi python=3.11.5
 
 ```
 
@@ -106,11 +106,11 @@ conda activate bioprediction
 
 ```
 
-**4 - You can deactivate the environment using:**
+**4 - Install packages:**
 
 ```sh
 
-conda deactivate
+pip install -r requeriments.txt
 
 ```
 ## How to use
