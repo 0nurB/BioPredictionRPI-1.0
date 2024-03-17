@@ -22,7 +22,7 @@
 <h1 align="center"></h1>
 
 
-## Main:
+## Main
 
 **Published paper:** submitted!!!
 
