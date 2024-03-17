@@ -21,7 +21,7 @@ platformdirs==4.2.0
 polars==0.20.10
 py4j==0.10.9.7
 pyfume==0.2.25
-python-graphviz
+graphviz==0.20.1
 reportlab==4.1.0
 requests-cache==1.2.0
 scikit-learn==1.4.1.post1
