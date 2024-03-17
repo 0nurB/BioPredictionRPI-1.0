@@ -4,7 +4,6 @@ bioservices==1.11.2
 catboost==1.2.3
 cattrs==23.2.3
 colorlog==6.8.2
-dgl==2.0.0
 easydev==0.13.1
 fst-pso==1.8.1
 fuzzytm==2.0.5
