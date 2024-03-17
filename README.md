@@ -40,12 +40,15 @@ steps, before an ML algorithm can be efficiently applied. The addition of these 
 better performance than all tools in 40% to 100% of cases, depending on the experiment. Finally, BioPrediction-RPI can fine-tune models based on new data and perform at the same level as ML experts, thus democratizing end-to-end ML and increasing its access to those working in biological sciences.
 
 * To the best of our knowledge, this is the first study to propose an automated pipeline for feature engineering and model training to classify interactions between biological sequences, competitive with models developed by experts.
+* 
 • The pipeline was mainly tested on datasets regarding RNA-Protein interactions.
+
 • BioPrediction-RPI does not require specialist human assistance.
+
 • BioPrediction-RPI can accelerate new studies, democratizing the use of ML techniques by non-experts in ML.
 
 <h1 align="center">
-  <img src="https://github.com/0nurB/BioPredictionRPI-1.0/blob/main/img/overall.png" alt="BioPrediction-Flowchart" width="600"> 
+  <img src="https://github.com/0nurB/BioPredictionRPI-1.0/blob/main/img/overall_new.pdf" alt="BioPrediction-Flowchart" width="600"> 
 </h1>
 
 
