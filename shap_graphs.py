@@ -114,7 +114,7 @@ def shap_waterf(explainer, model, X_test, X_label, path):
             plt.savefig(local_name, dpi=300, bbox_inches='tight')
 
             # Close the plot to release resources.
-            plt.close(sp)
+            plt.close()
 
             # Append the file path of the generated waterfall graph to the list.
             graphs_path.append(local_name)
@@ -139,7 +139,7 @@ def shap_bar(shap_values, path, fig_name):
     plt.title(fig_name, fontsize=16)
     sp = shap.plots.bar(shap_values, show=False)
     plt.savefig(local_name, dpi=300, bbox_inches='tight')
-    plt.close(sp)
+    plt.close()
     return local_name
 
 
@@ -159,5 +159,5 @@ def shap_beeswarm(shap_values, path, fig_name):
     plt.title(fig_name, fontsize=16)
     sp = shap.plots.beeswarm(shap_values, show=False)
     plt.savefig(local_name, dpi=300, bbox_inches='tight')
-    plt.close(sp)
+    plt.close()
     return local_name
