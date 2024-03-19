@@ -26,6 +26,8 @@
 
 **Published paper:** submitted!!!
 
+**See our example on Colab:** BioPrediction_RPI_Example.ipynb File!
+
 BioPrediction is part of a bigger project that proposes to democratize Machine Learning for the analysis, study, and control of epidemics and pandemics. [Take a look!!!](http://autoaipandemics.icmc.usp.br)
 
 ## Awards
