@@ -106,39 +106,43 @@ def imbalanced_function(clf, train, train_labels):
         print('There are imbalanced labels...')
         print('Checking the best technique...')
         performance = []
-        smote = imbalanced_techniques(clf, SMOTE(random_state=42), train, train_labels)
+        #smote = imbalanced_techniques(clf, SMOTE(random_state=42), train, train_labels)
         random = imbalanced_techniques(clf, RandomUnderSampler(random_state=42), train, train_labels)
-        cluster = imbalanced_techniques(clf, ClusterCentroids(random_state=42), train, train_labels)
-        near = imbalanced_techniques(clf, EditedNearestNeighbours(), train, train_labels)
-        near_miss = imbalanced_techniques(clf, NearMiss(), train, train_labels)
-        performance.append(smote)
+        #cluster = imbalanced_techniques(clf, ClusterCentroids(random_state=42), train, train_labels)
+        #near = imbalanced_techniques(clf, EditedNearestNeighbours(), train, train_labels)
+        #near_miss = imbalanced_techniques(clf, NearMiss(), train, train_labels)
+        #performance.append(smote)
         performance.append(random)
-        performance.append(cluster)
-        performance.append(near)
-        performance.append(near_miss)
+        #performance.append(cluster)
+        #performance.append(near)
+        #performance.append(near_miss)
         max_pos = performance.index(max(performance))
+        #if max_pos == 0:
+        #    print('Applying Smote - Oversampling...')
+        #    sm = SMOTE(random_state=42)
+        #   train, train_labels = sm.fit_resample(train, train_labels)
         if max_pos == 0:
-            print('Applying Smote - Oversampling...')
-            sm = SMOTE(random_state=42)
-            train, train_labels = sm.fit_resample(train, train_labels)
-        elif max_pos == 1:
             print('Applying Random - Undersampling...')
             sm = RandomUnderSampler(random_state=42)
             train, train_labels = sm.fit_resample(train, train_labels)
-        elif max_pos == 2:
-            print('Applying ClusterCentroids - Undersampling...')
-            sm = ClusterCentroids(random_state=42)
-            train, train_labels = sm.fit_resample(train, train_labels)
-        elif max_pos == 3:
-            print('Applying EditedNearestNeighbours - Undersampling...')
-            sm = EditedNearestNeighbours()
-            train, train_labels = sm.fit_resample(train, train_labels)
+        #elif max_pos == 1:
+        #    print('Applying ClusterCentroids - Undersampling...')
+        #    sm = ClusterCentroids(random_state=42)
+        #    train, train_labels = sm.fit_resample(train, train_labels)
+        #elif max_pos == 3:
+        #    print('Applying EditedNearestNeighbours - Undersampling...')
+        #    sm = EditedNearestNeighbours()
+        #    train, train_labels = sm.fit_resample(train, train_labels)
         else:
             print('Applying NearMiss - Undersampling...')
             sm = NearMiss()
             train, train_labels = sm.fit_resample(train, train_labels)
     else:
         print('There are no imbalanced labels...')
+        train = []
+        train_labels = []
+        sm = []
+        return train,train_labels,sm
     return train, train_labels, sm
 
 def fitting(test_data, score_name, clf_fit, X_test, y_test, output_table, output_metrics=None):
@@ -806,6 +810,24 @@ def fit_mod(input_interactions_train, sequences_dictionary, n_cpu, foutput, cand
             if 'label' in carac2.columns:
                 carac2 = carac2.drop(columns='label')
 
+            X_tr, y_tr, X_te, y_te, te_data, X_fi, y_fi, te_data_final = \
+                make_trains(train_edges_output[p], test_edges_output[p], final_edges_output[p], carac, carac)
+
+            X_tr, y_tr, sm = imbalanced_function(xgb.XGBClassifier(random_state=43), X_tr, y_tr)
+            
+            if sm != []: 
+                caminho_do_arquivo = train_edges_output[p]
+                dataset_original = pd.read_csv(caminho_do_arquivo)
+
+                X = dataset_original.drop('Label', axis=1)
+                y = dataset_original['Label']
+                X_resampled, y_resampled = sm.fit_resample(X, y)
+
+                dataset_resampleado = pd.DataFrame(X_resampled, columns=X.columns)
+                dataset_resampleado['Label'] = y_resampled
+
+                dataset_resampleado.to_csv(caminho_do_arquivo, index=False)                
+                
             trains = []
             tests = []  
             cands = []
@@ -955,4 +977,4 @@ if __name__ == '__main__':
     
     # You can use this example to run the BioPrediction niuhui
     
-    #python BioPrediction.py -input_interactions_train datasets/exp_1/RPI369/RPI369_pairs.csv -sequences_dictionary_protein datasets/exp_1/RPI369/RPI369_protein_seq.fa -sequences_dictionary_rna datasets/exp_1/RPI369/RPI369_dna_seq.fa -output test_rna_369_1 -input_interactions_candidates datasets\exp_1\RPI369/candidates_pairs.csv
+    #python BioPrediction.py -input_interactions_train datasets/exp_1/RPI488/RPI488_pairs.csv -sequences_dictionary_protein datasets/exp_1/RPI488/RPI488_protein_seq.fa -sequences_dictionary_rna datasets/exp_1/RPI488/RPI488_dna_seq.fa -output test_rna_488_new -input_interactions_candidates datasets\exp_1\RPI488/candidates_pairs.csv

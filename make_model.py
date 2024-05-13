@@ -225,45 +225,45 @@ def better_model(X_train, y_train, X_test, y_test, output, tuning=False, metric=
     
     # If tuning is True, perform hyperparameter tuning for the best model
     if tuning:
-        #print('tuning', best_model)
         dt_param_grid = {
         'criterion': ['gini', 'entropy'],
-        'splitter': ['best', 'random'],
-        'max_depth': [None, 1, 2, 4, 7, 10, 15],
-        'min_samples_split': [2, 5, 10],
-        'min_samples_leaf': [1, 2, 4],
+        'max_depth': [None, 1, 2, 4, 6, 8],
+        'min_samples_split': [5, 10, 20],
+        'min_samples_leaf': [5, 10, 20],
         'max_features': [None, 'sqrt', 'log2'],
         'class_weight': [None, 'balanced']
     }
         
         rf_param_grid = {
-        'n_estimators': [50, 100, 200],
-        'max_depth': [None, 2, 5, 10, 20],
-        'min_samples_split': [2, 5, 10],
-        'min_samples_leaf': [1, 2, 4]
+        'criterion': ['gini', 'entropy'],
+        'max_depth': [None, 1, 2, 5, 8, 10],
+        'min_samples_split': [5, 10, 20],
+        'min_samples_leaf': [5, 10, 20],
+        #'learning_rate': [0.01, 0.05, 0.1]
     }
         catboost_param_grid = {
-        'iterations': [100, 200, 300],  # Número de iterações
+        #'iterations': [100, 200, 300],  # Número de iterações
         'learning_rate': [0.01, 0.05, 0.1],  # Taxa de aprendizado
-        'depth': [None, 4, 6, 8, 12],  # Profundidade da árvore
+        'depth': [None, 1, 2, 4, 6, 8],  # Profundidade da árvore
         'l2_leaf_reg': [1, 3, 5],  # Regularização L2
-        'bagging_temperature': [0.5, 1.0, 1.5],  # Temperatura de bagging
-        'border_count': [32, 64, 128],  # Número de pontos de divisão na borda
-        'scale_pos_weight': [1, 3, 5],  # Peso positivo para balanceamento de classes
+        #'bagging_temperature': [0.5, 1.0, 1.5],  # Temperatura de bagging
+        #'border_count': [32, 64, 128],  # Número de pontos de divisão na borda
+        'scale_pos_weight': [1, 2, 3],  # Peso positivo para balanceamento de classes
         'eval_metric': ['F1'],  # Métrica de avaliação
     }        
         xgb_param_grid = {
+        #'criterion': ['gini', 'entropy'],
         'learning_rate': [0.01, 0.05, 0.1],
-        'n_estimators': [100, 200, 300],
-        'max_depth': [None, 3, 4, 5, 10, 15],
-        'min_child_weight': [1, 3, 5],
-        'subsample': [0.8, 0.9, 1.0],
-        'colsample_bytree': [0.8, 0.9, 1.0],
-        'gamma': [0, 0.1, 0.2],
-        'reg_alpha': [0, 0.1, 0.3, 0.5],
-        'reg_lambda': [0, 0.1, 0.5],
-        'scale_pos_weight': [1, 3, 5],
-        'eval_metric': ['logloss'],
+        'max_depth': [None, 1, 2, 4, 6, 8],
+        'min_child_weight': [1, 2, 3],
+        #'colsample_bytree': [0.8, 0.9, 1.0],
+        #'gamma': [0, 0.1, 0.2],
+        #'min_samples_split': [5, 10, 20],  # Adding min_samples_split here
+        #'min_samples_leaf': [5, 10, 20], 
+        #'reg_alpha': [0, 0.1, 0.3, 0.5],
+        #'reg_lambda': [0, 0.1, 0.5],
+        'scale_pos_weight': [1, 2, 3]
+        #'eval_metric': ['logloss'],
     }
         
         if perf.index(max(perf)) == 0:
