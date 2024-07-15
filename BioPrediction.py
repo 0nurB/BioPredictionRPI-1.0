@@ -198,7 +198,7 @@ def make_dataset(test_edges, carac, carac2):
     test_edges.iloc[:, :2] = test_edges.iloc[:, :2].astype(str)
     
     # Merge test_edges with carac based on source and target nodes
-    test_data = test_edges.merge(carac2, left_on=columns[1], right_index=True).merge(carac, left_on=columns[0], right_index=True)
+    test_data = test_edges.merge(carac2, left_on=columns[0], right_index=True).merge(carac, left_on=columns[1], right_index=True)
     
     test_data = test_data.drop_duplicates()
     
@@ -358,9 +358,9 @@ def partial_models2(index, datasets, names, datasets2, names2, train_edges, test
             df = carac.drop(columns=['label'])
         if 'label' in carac2.columns:
             df = carac2.drop(columns=['label'])
-        candidates_data = candidates.merge(carac2, left_on=columns[1], right_index=True).merge(carac, left_on=columns[0], right_index=True)
+        candidates_data = candidates.merge(carac2, left_on=columns[0], right_index=True).merge(carac, left_on=columns[1], right_index=True)
         candidates_data = candidates_data.drop(columns=['ProteinA', 'ProteinB'])
-
+        #print(candidates_data)
         score = clf.predict_proba(candidates_data)[:, 1]
         predictions=[]
         Score_table(candidates_names, predictions, score, 'Score_'+names+'_'+names2, partial_folds+'/data_candidates_'+names+'_'+names2+'.csv')
@@ -873,14 +873,15 @@ def fit_mod(input_interactions_train, sequences_dictionary, n_cpu, foutput, cand
             preds_proba = clf.predict_proba(final_X_test.values)[:, 1]
             metrics(predictions, final_y_test, preds_proba, output_folds_number[p]+'/metrics_model_final.csv')
             
-        if isinstance(candidates, pd.DataFrame):
-            predictions = clf.predict(final_X_cand)
-            score = clf.predict_proba(final_X_cand)[:, 1]
-            score_name = 'Candidate_score'
-            output_table = output_folds_number[p]+'/candidates_prediction.csv'
-            model_result = nameseq_cand.copy()
-            model_result[score_name] = score
-            model_result.to_csv(output_table, index=False)
+            if isinstance(candidates, pd.DataFrame):
+                #pront('foi')
+                predictions = clf.predict(final_X_cand)
+                score = clf.predict_proba(final_X_cand)[:, 1]
+                score_name = 'Candidate_score'
+                output_table = output_folds_number[p]+'/candidates_prediction.csv'
+                model_result = nameseq_cand.copy()
+                model_result[score_name] = score
+                model_result.to_csv(output_table, index=False)
 
     metrics_output = []
     for p in range(num_folds):
@@ -975,6 +976,9 @@ if __name__ == '__main__':
 
 
     
-    # You can use this example to run the BioPrediction niuhui
+    # You can use this example to run the BioPrediction:
     
     #python BioPrediction.py -input_interactions_train datasets/exp_1/RPI488/RPI488_pairs.csv -sequences_dictionary_protein datasets/exp_1/RPI488/RPI488_protein_seq.fa -sequences_dictionary_rna datasets/exp_1/RPI488/RPI488_dna_seq.fa -output test_rna_488_new -input_interactions_candidates datasets\exp_1\RPI488/candidates_pairs.csv
+    
+    
+    #python BioPrediction.py -input_interactions_train datasets/exp_3.1/dataset_3/new_pares.csv -sequences_dictionary_protein datasets/exp_3.1/dataset_3/protein_sequences.fasta -sequences_dictionary_rna datasets/exp_3.1/dataset_3/lncRNA_sequence.txt -output test_rna_new3.1 -input_interactions_candidates  datasets/exp_3.1/dataset_3/all_combin.csv

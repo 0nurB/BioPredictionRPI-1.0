@@ -170,7 +170,7 @@ def better_model(X_train, y_train, X_test, y_test, output, tuning=False, metric=
         best_model: The best-performing classifier.
     """
     valor_teto = 1e9  # Substitua pelo valor desejado
-    #print(X_train)
+    print(X_train)
     # Substitua valores infinitos ou muito grandes pelo valor teto
     X_train.replace([np.inf, -np.inf, np.nan], valor_teto, inplace=True)
 
@@ -304,13 +304,13 @@ def Score_table(test_data, predictions, scores, scores_name, output):
     # Create a 'nameseq' column by concatenating the first and second columns as strings
     model_result['nameseq'] = model_result[columns[0]].astype(str) + '_' + model_result[columns[1]].astype(str)
     model_result = model_result.drop(columns=[columns[0], columns[1]])
-
+    #print(columns[0], columns[1], scores_name, scores)
     # Add columns for predicted labels and the specified scores
     #model_result['PredictedLabel'] = predictions
     model_result[scores_name] = scores
     #print(model_result.columns)
     # Reorder the columns in the desired order
-    #print('aqqq')
+
     #print(columns, 'the len', len(columns))
     if 'Label' in test_data.columns:
         #print(columns, 'the len', len(columns))
