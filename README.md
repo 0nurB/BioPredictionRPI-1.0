@@ -13,7 +13,7 @@
 
 <p align="center">
   <a href="https://github.com/Bonidia/BioPrediction">Home</a> •
-  <a href="http://autoaipandemics.icmc.usp.br">AutoAI Pandemics</a> •
+  <a href="http://autoaipandemics.icmc.usp.br">AutoAI-Pandemics</a> •
   <a href="#installing-dependencies-and-package">Installing</a> •
   <a href="#how-to-use">How To Use</a> •
   <a href="#citation">Citation</a> 
@@ -24,7 +24,7 @@
 
 ## Main
 
-**Published paper:** submitted!!!
+**Published paper:** Florentino, B. R., Parmezan Bonidia, R., Sanches, N. H., Da Rocha, U. N., & De Carvalho, A. C. (2024). BioPrediction-RPI: Democratizing the prediction of interaction between non-coding RNA and protein with end-to-end machine learning. Computational and Structural Biotechnology Journal, 23, 2267-2276. https://doi.org/10.1016/j.csbj.2024.05.031.
 
 **See our example on Colab:** BioPrediction_RPI_Example.ipynb File!
 
@@ -146,4 +146,4 @@ Note Inserting a test dataset is optional.
 
 If you use this code in a scientific publication, we would appreciate citations to the following paper:
 
-In progress...
+Florentino, B. R., Parmezan Bonidia, R., Sanches, N. H., Da Rocha, U. N., & De Carvalho, A. C. (2024). BioPrediction-RPI: Democratizing the prediction of interaction between non-coding RNA and protein with end-to-end machine learning. Computational and Structural Biotechnology Journal, 23, 2267-2276. https://doi.org/10.1016/j.csbj.2024.05.031
