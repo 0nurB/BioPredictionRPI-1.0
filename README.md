@@ -134,12 +134,12 @@ where:
 
 Those dictionaries must contain all sequences in train, test, and candidates.
 
+ -topology_features: uses topology features to characterization of the sequences, e.g., yes or no, default=no)
  -output: output path, e.g., experiment_1
 
 execution example:
 python BioPrediction.py -input_interactions_train datasets/exp_1/RPI369/RPI369_pairs.csv -sequences_dictionary_protein datasets/exp_1/RPI369/RPI369_protein_seq.fa -sequences_dictionary_rna datasets/exp_1/RPI369/RPI369_dna_seq.fa -output exp_369
 
-Note Inserting a test dataset is optional.
 ```
 
 ## Citation
