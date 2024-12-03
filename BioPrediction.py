@@ -198,7 +198,7 @@ def make_dataset(test_edges, carac, carac2):
     test_edges.iloc[:, :2] = test_edges.iloc[:, :2].astype(str)
     
     # Merge test_edges with carac based on source and target nodes
-    test_data = test_edges.merge(carac2, left_on=columns[0], right_index=True).merge(carac, left_on=columns[1], right_index=True)
+    test_data = test_edges.merge(carac2, left_on=columns[1], right_index=True).merge(carac, left_on=columns[0], right_index=True)
     
     test_data = test_data.drop_duplicates()
     
@@ -358,7 +358,7 @@ def partial_models2(index, datasets, names, datasets2, names2, train_edges, test
             df = carac.drop(columns=['label'])
         if 'label' in carac2.columns:
             df = carac2.drop(columns=['label'])
-        candidates_data = candidates.merge(carac2, left_on=columns[0], right_index=True).merge(carac, left_on=columns[1], right_index=True)
+        candidates_data = candidates.merge(carac2, left_on=columns[1], right_index=True).merge(carac, left_on=columns[0], right_index=True)
         candidates_data = candidates_data.drop(columns=['ProteinA', 'ProteinB'])
         #print(candidates_data)
         score = clf.predict_proba(candidates_data)[:, 1]
