@@ -245,7 +245,7 @@ def make_trains(train, test, final_test, carac, carac2):
     return X_train, y_train, X_test, y_test, test_data, X_final, y_final, test_data_final
 
 
-def partial_models(index, datasets, names, train_edges, test_edges, final_test, partial_folds):
+def partial_models(index, datasets, names, train_edges, test_edges, final_test, partial_folds, candidates):
     """
     Create and save partial models and associated data for a specific dataset.
 
@@ -292,12 +292,22 @@ def partial_models(index, datasets, names, train_edges, test_edges, final_test, 
         candidates_names = candidates.copy()
 
         if 'label' in carac.columns:
-            df = carac.drop(columns=['label'])
+            carac = carac.drop(columns=['label'])
+        if 'Label' in carac.columns:
+            carac = carac.drop(columns=['Label'])
+            
+        if 'label' in candidates.columns:
+            candidates = candidates.drop(columns=['label'])
+        if 'Label' in candidates.columns:
+            candidates = candidates.drop(columns=['Label'])
+            
+       
 
+        print(carac.columns)
         candidates_data = candidates.merge(carac, left_on=columns[1], right_index=True).merge(carac, left_on=columns[0], right_index=True)
         #print(X_train)
         candidates_data = candidates_data.drop(columns=['ProteinA', 'ProteinB'])
-        #print(candidates_data)
+        print(candidates_data)
         score = clf.predict_proba(candidates_data)[:, 1]
         predictions=[]
         Score_table(candidates_names, predictions, score, 'Score_'+names, partial_folds+'/data_candidates_'+names+'.csv')
@@ -307,7 +317,7 @@ def partial_models(index, datasets, names, train_edges, test_edges, final_test, 
     generated_plt = interp_shap(clf, X_train, y_train, partial_folds, name = names.replace('_protein', '')) 
     build_interpretability_report(generated_plt=generated_plt, directory=partial_folds, name = names.replace('_protein', ''))
 
-def partial_models2(index, datasets, names, datasets2, names2, train_edges, test_edges, final_test, partial_folds):
+def partial_models2(index, datasets, names, datasets2, names2, train_edges, test_edges, final_test, partial_folds, candidates):
     """
     Create and save partial models and associated data for a specific dataset.
 
@@ -358,6 +368,14 @@ def partial_models2(index, datasets, names, datasets2, names2, train_edges, test
             df = carac.drop(columns=['label'])
         if 'label' in carac2.columns:
             df = carac2.drop(columns=['label'])
+        if 'label' in candidates.columns:
+            candidates = candidates.drop(columns=['label'])
+        if 'Label' in candidates.columns:
+            candidates = candidates.drop(columns=['Label'])
+            
+            
+            
+            
         candidates_data = candidates.merge(carac2, left_on=columns[1], right_index=True).merge(carac, left_on=columns[0], right_index=True)
         candidates_data = candidates_data.drop(columns=['ProteinA', 'ProteinB'])
         #print(candidates_data)
@@ -592,6 +610,11 @@ def feat_eng(input_interactions_train, sequences_dictionary, stype, n_cpu, foutp
     
     #extrac_topo_features = False
     extrac_math_featuresB = True
+    
+    
+    extrac_topo_features = False
+    extrac_math_featuresB = False
+    
     output_folds = foutput+'/folds_and_topology_feats'
     make_fold(output_folds)
 
@@ -792,7 +815,10 @@ def fit_mod(input_interactions_train, sequences_dictionary, n_cpu, foutput, cand
         result_df = result_df.rename(columns={'Node_x': 'Node'})
         '''
 
-        result_df.to_csv(foutput+'/folds_and_topology_feats/fold'+str(p+1)+'/feat_'+'topology'+'.csv')
+        result_df.to_csv(
+            foutput+'/folds_and_topology_feats/fold'+str(p+1)+'/feat_'+'topology'+'.csv',
+            index=False
+        )
         datasets_topo.append(foutput+'/folds_and_topology_feats/fold'+str(p+1)+'/feat_'+'topology'+'.csv')
         names_topo.append('topology')
      
@@ -832,7 +858,7 @@ def fit_mod(input_interactions_train, sequences_dictionary, n_cpu, foutput, cand
             tests = []  
             cands = []
             if extrac_topo_features:
-                partial_models('Node', datasets_topo[p], names_topo[0], train_edges_output[p], test_edges_output[p], final_edges_output[p], partial_folds[p])
+                partial_models('Node', datasets_topo[p], names_topo[0], train_edges_output[p], test_edges_output[p], final_edges_output[p], partial_folds[p], candidates)
                 trains.append(partial_folds[p]+'/data_train_'+names_topo[0]+'.csv')
                 tests.append(partial_folds[p]+'/data_test_'+names_topo[0]+'.csv')
                 if isinstance(candidates, pd.DataFrame): 
@@ -840,7 +866,7 @@ def fit_mod(input_interactions_train, sequences_dictionary, n_cpu, foutput, cand
                 
             for j in range(len(datasets_extr)):
                 partial_models2('nameseq', datasets_extr[j], names_math[j], datasets_extr2[j], names_math2[j], train_edges_output[p], 
-                               test_edges_output[p], final_edges_output[p], partial_folds[p])
+                               test_edges_output[p], final_edges_output[p], partial_folds[p], candidates)
                 trains.append(partial_folds[p]+'/data_train_'+names_math[j]+'_'+names_math2[j]+'.csv')
                 tests.append(partial_folds[p]+'/data_test_'+names_math[j]+'_'+names_math2[j]+'.csv')         
                 if isinstance(candidates, pd.DataFrame): 
@@ -875,6 +901,16 @@ def fit_mod(input_interactions_train, sequences_dictionary, n_cpu, foutput, cand
             
             if isinstance(candidates, pd.DataFrame):
                 #pront('foi')
+                
+                                      
+                if 'label' in candidates.columns:
+                    candidates = candidates.drop(columns=['label'])
+                if 'Label' in candidates.columns:
+                    candidates = candidates.drop(columns=['Label'])
+                if 'Label_y' in final_X_cand.columns:
+                    final_X_cand = final_X_cand.drop(columns=['Label_y'])
+            
+                #print(final_X_cand.columns)
                 predictions = clf.predict(final_X_cand)
                 score = clf.predict_proba(final_X_cand)[:, 1]
                 score_name = 'Candidate_score'
