@@ -612,8 +612,8 @@ def feat_eng(input_interactions_train, sequences_dictionary, stype, n_cpu, foutp
     extrac_math_featuresB = True
     
     
-    extrac_topo_features = False
-    extrac_math_featuresB = False
+    #extrac_topo_features = False
+    #extrac_math_featuresB = False
     
     output_folds = foutput+'/folds_and_topology_feats'
     make_fold(output_folds)
