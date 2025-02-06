@@ -103,7 +103,7 @@ def precision_graph(output_data, output):
     thresholds = thresholds[::-1]
     accuracies = accuracies[::-1]
 
-    plt.plot(thresholds * 100, accuracies, marker='o', linestyle='-')
+    plt.plot(thresholds, accuracies, marker='o', linestyle='-')
     plt.title('Precision vs. Threshold (Threshold > 50%)')
     plt.xlabel('Threshold (%)')
     plt.ylabel('Precision')
@@ -120,120 +120,44 @@ def precision_graph(output_data, output):
 
 def coverage_graph(output_data, output):
     """
-    Generate and save a coverage vs. percentage of the dataset graph.
+    Generate and save a recall vs. threshold graph.
 
     Parameters:
     - output_data: A DataFrame containing the final predictions and related information.
     - output: The directory where the graph image will be saved.
 
     Returns:
-    - output: The file path to the saved coverage vs. percentage of the dataset graph.
+    - output: The file path to the saved recall vs. threshold graph.
     """
     
-    """
     y_true = output_data['Class_real']
-    y_pred = output_data['Class_pred']
     y_score = output_data['Probability of class 1']
-
-    max_radius = y_true.value_counts()[1]
-    total_size = y_true.shape[0]
-    predicted_values = y_score.unique()
-    score_list = y_score.values.tolist()
-    points = []
     
-    for i in range(1, len(predicted_values)):
-        index = score_list.index(predicted_values[i])
-        points.append(len(score_list[:index]))
-
-    division = 0
-    limit = 0.5
-
-    # Find the division point where predicted scores are less than 0.5.
-    for i in range(1, len(predicted_values)):
-        if predicted_values[i] < 0.5:
-            limit = predicted_values[i]
-            division = score_list.index(predicted_values[i])
-            break
-    true_list = y_true.values.tolist()
-    radius = []
-
-    # Calculate coverage percentage for each point.
-    for i in range(len(points)):
-        radius.append(sum(true_list[:points[i]]) / max_radius)
-        if radius[len(radius) - 1] > 0.985:
-            break
-            
-    total_samples = len(y_true)
-    x = points[:len(radius)]
-    x = [element / total_samples for element in x]
-    y = radius
-
-    # Plot the coverage vs. percentage of the dataset graph.
-    plt.plot(x, y, label='')
-    plt.axvline(x=division / total_samples, color='red', label='Conventional division')
-    plt.xlabel('Percentage of the dataset')
-    plt.ylabel('Coverage percentage')
-    plt.title('Coverage of true positives on the test data')
-    plt.tick_params(axis='x', which='major', direction='inout', length=10, width=1, colors='black')
-    plt.legend()
-    output = output + '/graph_coverage.png'
-    plt.savefig(output, format='png')
-    """
-    y_true = output_data['Class_real']
-    y_pred = output_data['Class_pred']
-    y_score = output_data['Probability of class 1']
-
-    precision, recall, thresholds = precision_recall_curve(y_true, y_score)
-
-    # Adicione um ponto ao final de thresholds para corresponder ao tamanho de recall
-    thresholds = list(thresholds)
-    thresholds.append(1.0)
-    thresholds = np.array(thresholds)
-
-    # Plotar o gráfico de Recall por Threshold
-    plt.figure(figsize=(10, 6))
-    plt.plot(thresholds, recall, 'b', label='Recall')
-    plt.axvline(x=0.5, color='red', linestyle='--', label='Threshold 0.5')  # Adiciona linha vermelha no threshold 0.5
-    plt.xlabel('Threshold')
+    thresholds = np.sort(y_score.unique())[::-1]  # Ordena os thresholds em ordem decrescente
+    recalls = []
+    
+    total_positives = sum(y_true)
+    
+    for threshold in thresholds:
+        y_pred = (y_score >= threshold).astype(int)
+        true_positives = sum((y_pred == 1) & (y_true == 1))
+        recall = true_positives / total_positives if total_positives > 0 else 0
+        recalls.append(recall)
+    
+    # Plot do gráfico
+    plt.plot(thresholds, recalls, label='Recall by Threshold')
+    plt.xlabel('Threshold (%)')
     plt.ylabel('Recall')
-    plt.title('Recall por Threshold')
-    plt.legend(loc='best')
+    plt.title('Recall vs. Threshold - Candidates interactions')
+    plt.axvline(x=0.5, color='red', linestyle='--', label='50% threshold')
+    plt.gca().invert_xaxis()  # Invert the x-axis for increasing thresholds.
     plt.grid(True)
-    plt.gca().invert_xaxis()  
-    plt.yticks(np.arange(0, 1.1, 0.1))
-    plt.xticks(np.arange(0, 1.1, 0.1))
-    output1 = output + '/graph_coverage.png'
-    plt.savefig(output1, format='png')
-   
-
-
-    precision, recall, thresholds = precision_recall_curve(y_true, y_score)
-    # Adicione um ponto ao final de thresholds para corresponder ao tamanho de precision
-    thresholds = list(thresholds)
-    thresholds.append(1.0)
-    thresholds = np.array(thresholds)
-
-    # Ajuste o tamanho de precision para corresponder ao tamanho de thresholds
-    precision = np.array(precision) #[:-1])
-
-    # Plotar o gráfico de Precision por Threshold
-    plt.figure(figsize=(10, 6))
-    plt.plot(thresholds, precision, 'b', label='Precision')  # Usar precision ajustado para corresponder aos thresholds
-    plt.axvline(x=0.5, color='red', linestyle='--', label='Threshold 0.5')  # Adiciona linha vermelha no threshold 0.5
-    plt.xlabel('Threshold')
-    plt.ylabel('Precision')
-    plt.title('Precision por Threshold')
-    plt.legend(loc='best')
-    plt.grid(True)
-    plt.gca().invert_xaxis() 
-    plt.yticks(np.arange(0, 1.1, 0.1))
-    plt.xticks(np.arange(0, 1.1, 0.1))
-    output2 = output + '/graph_precision.png'
-    plt.savefig(output2, format='png')
+    plt.legend()
     
-
-    # Return the file path to the saved coverage vs. percentage of the dataset graph.
-    return output
+    output_path = output + '/graph_recall.png'
+    plt.savefig(output_path, format='png')
+    
+    return output_path
 
 
 def make_fig_graph(output_data, output):
