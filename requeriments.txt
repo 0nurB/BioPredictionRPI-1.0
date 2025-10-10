@@ -4,7 +4,6 @@ bioservices==1.11.2
 catboost==1.2.3
 cattrs==23.2.3
 colorlog==6.8.2
-dgl==2.1.0
 easydev==0.13.1
 fst-pso==1.8.1
 fuzzytm==2.0.5
@@ -20,6 +19,7 @@ node2vec==0.4.6
 pexpect==4.9.0
 platformdirs==4.2.0
 polars==0.20.10
+numba==0.62.1
 py4j==0.10.9.7
 pyfume==0.2.25
 graphviz==0.20.1

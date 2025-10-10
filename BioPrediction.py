@@ -6,7 +6,7 @@ import random
 import warnings
 import joblib
 import networkx as nx
-import dgl
+#import dgl
 import torch
 import statistics
 from sklearn.model_selection import train_test_split, GridSearchCV, KFold
@@ -21,8 +21,8 @@ from sklearn.preprocessing import StandardScaler
 from catboost import CatBoostClassifier
 #import lightgbm as lgb
 import xgboost as xgb
-from dgl import DGLGraph
-from dgl.nn import SAGEConv
+#from dgl import DGLGraph
+#from dgl.nn import SAGEConv
 from node2vec import Node2Vec
 from Bio import SeqIO
 import argparse
@@ -59,12 +59,17 @@ from imblearn.over_sampling import SMOTE
 from imblearn.under_sampling import RandomUnderSampler
 from imblearn.under_sampling import NearMiss 
 from imblearn.under_sampling import EditedNearestNeighbours 
-from imblearn.under_sampling import CondensedNearestNeighbour 
+from imblearn.under_sampling import CondensedNearestNeighbour
 from imblearn.combine import SMOTEENN 
 from imblearn.combine import SMOTETomek 
 from imblearn.under_sampling import ClusterCentroids
 from sklearn.model_selection import StratifiedKFold
 from imblearn.pipeline import Pipeline
+
+import warnings
+from sklearn.exceptions import DataConversionWarning
+
+warnings.filterwarnings(action='ignore', category=DataConversionWarning)
 
 path = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(path + '/repDNA/repDNA/')
@@ -303,11 +308,11 @@ def partial_models(index, datasets, names, train_edges, test_edges, final_test, 
             
        
 
-        print(carac.columns)
+        #print(carac.columns)
         candidates_data = candidates.merge(carac, left_on=columns[1], right_index=True).merge(carac, left_on=columns[0], right_index=True)
         #print(X_train)
         candidates_data = candidates_data.drop(columns=['ProteinA', 'ProteinB'])
-        print(candidates_data)
+        #print(candidates_data)
         score = clf.predict_proba(candidates_data)[:, 1]
         predictions=[]
         Score_table(candidates_names, predictions, score, 'Score_'+names, partial_folds+'/data_candidates_'+names+'.csv')
@@ -893,7 +898,7 @@ def fit_mod(input_interactions_train, sequences_dictionary, n_cpu, foutput, cand
 
             output_data = final_predictions(final_X_test, final_y_test, nameseq, clf, output_folds_number[p])
             generated_plt = utility(output_data, output_folds_number[p])
-            build_usability_report(generated_plt, report_name="usability.pdf", directory=output_folds_number[p])
+            #build_usability_report(generated_plt, report_name="usability.pdf", directory=output_folds_number[p])
 
             predictions = clf.predict(final_X_test.values)
             preds_proba = clf.predict_proba(final_X_test.values)[:, 1]

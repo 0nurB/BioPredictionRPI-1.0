@@ -6,7 +6,7 @@ import random
 import warnings
 import joblib
 import networkx as nx
-import dgl
+#import dgl
 import torch
 import statistics
 from sklearn.model_selection import train_test_split, GridSearchCV, KFold
@@ -20,8 +20,8 @@ from sklearn.preprocessing import StandardScaler
 from catboost import CatBoostClassifier
 #import lightgbm as lgb
 import xgboost as xgb
-from dgl import DGLGraph
-from dgl.nn import SAGEConv
+#from dgl import DGLGraph
+#from dgl.nn import SAGEConv
 from node2vec import Node2Vec
 from Bio import SeqIO
 import argparse
@@ -170,7 +170,7 @@ def better_model(X_train, y_train, X_test, y_test, output, tuning=False, metric=
         best_model: The best-performing classifier.
     """
     valor_teto = 1e9  # Substitua pelo valor desejado
-    print(X_train)
+    #print(X_train)
     # Substitua valores infinitos ou muito grandes pelo valor teto
     X_train.replace([np.inf, -np.inf, np.nan], valor_teto, inplace=True)
 
